@@ -54,6 +54,23 @@ namespace WordGame.Logic
                 ).ToMaybe();
         }
 
+        public Maybe<GameState> UndoLastSelection()
+        {
+            var maybeCharBoard = CharBoard.UndoLastSelection();
+
+            if (!maybeCharBoard.HasValue)
+            {
+                return Maybe.None<GameState>();
+            }
+
+            return new GameState(
+                Words,
+                StartsWith,
+                maybeCharBoard.Value,
+                AttemptResults
+                ).ToMaybe();
+        }
+
         public Maybe<GameState> CompleteWord()
         {
             if (!CharBoard.HasSelectedCharCells)

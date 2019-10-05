@@ -43,15 +43,27 @@ namespace WordGame.Logic
             return Maybe.None<CharBoard>();
         }
 
-        public static CharBoard New(IWords words, StartsWith startsWith, Word forceInclude = null)
+        internal Maybe<CharBoard> UndoLastSelection()
         {
-            var wordSet = words.GetWordsThatStartWith(startsWith);
-            return ConstructBoard(wordSet, new Random(23), forceInclude);
+            if (NextSelectionIndex == 0) return Maybe.None<CharBoard>();
+
+            var lastSelected = CharCells
+                .OrderByDescending(c => c.SelectionIndex.HasValue ? c.SelectionIndex.Value : 0)
+                .First();
+
+            var newCells = CharCells.Select(c => c == lastSelected ? lastSelected.Deselect() : c);
+            return new CharBoard(newCells, PossibleWords, NextSelectionIndex - 1).ToMaybe();
         }
 
         public bool HasWord(Word word)
         {
             return PossibleWords.Any(w => w.Value == word.Value);
+        }
+
+        public static CharBoard New(IWords words, StartsWith startsWith, Word forceInclude = null)
+        {
+            var wordSet = words.GetWordsThatStartWith(startsWith);
+            return ConstructBoard(wordSet, new Random(23), forceInclude);
         }
 
         public static CharBoard ConstructBoard(IEnumerable<Word> wordSet, Random random, Word forceInclude = null)
