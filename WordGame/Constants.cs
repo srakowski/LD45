@@ -11,5 +11,6 @@
         public const int WordEntryTileWidth = 80;
         public const int WordEntryTileHeight = 80;
 
+        public const int StartingHP = 10;
     }
 }

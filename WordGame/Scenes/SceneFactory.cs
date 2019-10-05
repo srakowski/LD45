@@ -12,13 +12,9 @@ namespace WordGame.Scenes
             {
                 return MainMenuScene.Create(param as Gameplay);
             }
-            else if (sceneName == nameof(TravelScene))
+            else if (sceneName == nameof(GameplayScene))
             {
-                return TravelScene.Create(param as Gameplay);
-            }
-            else if (sceneName == nameof(BossScene))
-            {
-                return BossScene.Create(param as Gameplay);
+                return GameplayScene.Create(param as Gameplay);
             }
             throw new NotImplementedException();
         }

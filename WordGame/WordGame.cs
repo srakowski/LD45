@@ -29,7 +29,7 @@ namespace WordGame
         {
             base.Initialize();
             gameplay = new Gameplay();
-            engine.LoadScene(nameof(Scenes.TravelScene), gameplay);
+            engine.LoadScene(nameof(Scenes.GameplayScene), gameplay);
         }
 
         protected override void Update(GameTime gameTime)

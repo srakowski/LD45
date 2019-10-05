@@ -7,11 +7,16 @@ namespace WordGame.Entities
     public class EncounterController : Entity
     {
         private Gameplay gameplay;
+        private TextSprite textSprite;
 
         public EncounterController(Gameplay gameplay)
         {
             this.gameplay = gameplay;
-            AddComponent(new WordInput(gameplay));
+
+            textSprite = new TextSprite(Constants.ProtoFont, "BEGIN", SpriteLayers.UITop);
+            AddComponent(textSprite);
+
+            AddComponent(new EncounterGameplay(gameplay, textSprite));
         }
     }
 }

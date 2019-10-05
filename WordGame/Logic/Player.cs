@@ -26,10 +26,10 @@ namespace WordGame.Logic
             Inventory = inventory;
         }
 
-        private Player(Player player)
+        private Player(Player player, int? hp = null)
         {
             Name = player.Name;
-            HP = player.HP;
+            HP = hp ?? player.HP;
             XP = player.XP;
             Level = player.Level;
             Str = player.Str;
@@ -54,14 +54,23 @@ namespace WordGame.Logic
 
         public IEnumerable<Item> Inventory { get; }
 
+        public bool IsAlive => HP > 0;
+
         public static Player New(string playerName)
         {
-            return new Player(playerName, 10, 0, 1, 1, 1, new Weapons.None(), Enumerable.Empty<Item>());
+            return new Player(playerName,
+                Constants.StartingHP, 
+                0,
+                1,
+                1,
+                1,
+                new Weapons.None(),
+                Enumerable.Empty<Item>());
         }
 
         public Player TakeDamage(int combatValue)
         {
-            return new Player(this);
+            return new Player(this, hp: Math.Clamp(HP - combatValue, 0, int.MaxValue));
         }
     }
 }

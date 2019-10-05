@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WordGame.Logic
 {
@@ -15,21 +16,43 @@ namespace WordGame.Logic
 
         public GameState CurrentState { get; private set; }
 
+        public bool EncounterIsActive => CurrentState.EncounterIsActive;
+
+        public Player Player => CurrentState.Player;
+
+        public bool EnemyIsAlive => CurrentState.EnemyIsAlive;
+
+        public bool PlayerIsAlive => CurrentState.PlayerIsAlive;
+
+        public Maybe<Enemy> ActiveEnemy => CurrentState.ActiveEnemy;
+
         internal bool MakeAutoLetterSelection(char c)
         {
             var result = CurrentState.MakeAutoLetterSelection(c);
             return HandleUpdateResult(result);
         }
 
-        internal bool CompleteWord()
+        internal bool Attack()
         {
-            var result = CurrentState.CompleteWord();
+            var result = CurrentState.CompleteWord(CombatMode.Attack);
+            return HandleUpdateResult(result);
+        }
+
+        internal bool Defend()
+        {
+            var result = CurrentState.CompleteWord(CombatMode.Defense);
             return HandleUpdateResult(result);
         }
 
         internal bool UndoLastSelection()
         {
             var result = CurrentState.UndoLastSelection();
+            return HandleUpdateResult(result);
+        }
+
+        public bool LoadNextEnemy()
+        {
+            var result = CurrentState.LoadNextEnemy();
             return HandleUpdateResult(result);
         }
 

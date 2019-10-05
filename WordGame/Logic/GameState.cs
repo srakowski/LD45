@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -21,7 +22,7 @@ namespace WordGame.Logic
             Player = player;
             Encounter = encounter;
 
-            Debug.WriteLine(string.Join("\n", CharBoard.PossibleWords.Select(c => c.Value).OrderBy(c => c.Length)));
+            // Debug.WriteLine(string.Join("\n", CharBoard.PossibleWords.Select(c => c.Value).OrderBy(c => c.Length)));
         }
 
         public Words Words { get; }
@@ -34,8 +35,15 @@ namespace WordGame.Logic
 
         public Player Player { get; }
 
+        public bool PlayerIsAlive => Player.IsAlive;
 
         public Encounter Encounter { get; }
+
+        public bool EnemyIsAlive => Encounter.ActiveEnemy.HasValue;
+
+        public bool EncounterIsActive => Encounter.HasLivingEnemies;
+
+        public Maybe<Enemy> ActiveEnemy => Encounter.ActiveEnemy;
 
         public static GameState New(Words words, string playerName)
         {
@@ -47,7 +55,7 @@ namespace WordGame.Logic
                 charBoard,
                 Enumerable.Empty<AttemptResult>(),
                 Player.New(playerName),
-                new Encounters.EnterGame()
+                Encounters.EnterDungeon()
             );
         }
 
@@ -87,7 +95,7 @@ namespace WordGame.Logic
                 Encounter).ToMaybe();
         }
 
-        public Maybe<GameState> CompleteWord()
+        public Maybe<GameState> CompleteWord(CombatMode mode)
         {
             if (!CharBoard.HasSelectedCharCells)
             {
@@ -106,13 +114,20 @@ namespace WordGame.Logic
 
             var encounter = Encounter;
             var player = Player;
+
             if (attemptResult is AttemptResult.SuccessResult)
             {
-                encounter = Encounter.TakeDamage(combatValue);
+                if (mode == CombatMode.Attack)
+                {
+                    encounter = Encounter.TakeDamage(combatValue);
+                }
             }
             else
             {
-                player = Player.TakeDamage(combatValue);
+                if (mode == CombatMode.Defense)
+                {
+                    player = Player.TakeDamage(combatValue);
+                }
             }
 
             var nextStartsWith = Words.GetNextStartsWith(seed, attemptResult is AttemptResult.SuccessResult ? word.ToMaybe() : Maybe.None<Word>());
@@ -125,6 +140,23 @@ namespace WordGame.Logic
                 player,
                 encounter
             ).ToMaybe();
+        }
+
+        public Maybe<GameState> LoadNextEnemy()
+        {
+            var encounter = Encounter.LoadNextEnemy();
+            if (!encounter.HasValue)
+            {
+                return Maybe.None<GameState>();
+            }
+            return new GameState(
+                Words,
+                StartsWith,
+                CharBoard,
+                AttemptResults,
+                Player,
+                encounter.Value
+                ).ToMaybe();
         }
     }
 }

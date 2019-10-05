@@ -56,7 +56,6 @@ namespace Coldsteel
             return this;
         }
 
-
         internal void Activate(Engine engine, Scene scene, Entity parent)
         {
             _engine = engine;

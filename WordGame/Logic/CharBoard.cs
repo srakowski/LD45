@@ -97,7 +97,7 @@ namespace WordGame.Logic
                 );
         }
 
-        public int GetCombatValue() => CharCells.Where(c => c.IsSelected).Sum(c => c.CombatValue);
+        public int GetCombatValue() => EndsWith.Length;
 
         private static IEnumerable<char> AddWord(IEnumerable<char> collection, Word word)
         {
