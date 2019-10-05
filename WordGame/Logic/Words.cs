@@ -7,7 +7,7 @@
     using System.Linq;
     using global::WordGame.Logic;
 
-    public class Words : IWords
+    public class Words
     {
         private Dictionary<string, List<string>> _wordsByStartsWith;
 

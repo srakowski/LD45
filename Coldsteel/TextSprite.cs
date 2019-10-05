@@ -61,11 +61,11 @@ namespace Coldsteel
             spriteBatch.DrawString(
                 _spriteFont.GetValue(),
                 Text,
-                Entity.Position,
+                Entity.GlobalPosition,
                 Color,
-                Entity.Rotation,
+                Entity.GlobalRotation,
                 Origin,
-                Entity.Scale,
+                Entity.GlobalScale,
                 SpriteEffects,
                 LayerDepth
             );

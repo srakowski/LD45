@@ -60,7 +60,13 @@ namespace WordGame.Logic
             return PossibleWords.Any(w => w.Value == word.Value);
         }
 
-        public static CharBoard New(IWords words, StartsWith startsWith, Word forceInclude = null)
+        public Maybe<CharCell> GetSelectionAtWordIndex(int index)
+        {
+            var selectionIndex = index - 2;
+            return CharCells.FirstOrDefault(cs => cs.SelectionIndex.ValueOr(() => -1) == selectionIndex).ToMaybe();
+        }
+
+        public static CharBoard New(Words words, StartsWith startsWith, Word forceInclude = null)
         {
             var wordSet = words.GetWordsThatStartWith(startsWith);
             return ConstructBoard(wordSet, new Random(23), forceInclude);

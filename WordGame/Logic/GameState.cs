@@ -6,7 +6,7 @@ namespace WordGame.Logic
     public class GameState
     {
         private GameState(
-            IWords words,
+            Words words,
             StartsWith startsWith,
             CharBoard charBoard,
             IEnumerable<AttemptResult> attemptResults,
@@ -21,7 +21,7 @@ namespace WordGame.Logic
             Encounter = encounter;
         }
 
-        public IWords Words { get; }
+        public Words Words { get; }
 
         public StartsWith StartsWith { get; }
 
@@ -34,7 +34,7 @@ namespace WordGame.Logic
 
         public Encounter Encounter { get; }
 
-        public static GameState New(IWords words, string playerName)
+        public static GameState New(Words words, string playerName)
         {
             var startsWith = new StartsWith('n', 'o');
             var charBoard = CharBoard.New(words, startsWith, "nothing");

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace WordGame.Logic
@@ -17,11 +18,17 @@ namespace WordGame.Logic
         public bool HasValue => _value?.Any() ?? false;
 
         public T Value => _value == null ? default : _value.SingleOrDefault();
+
+        public T ValueOr(Func<T> value) => HasValue ? Value : value();
+
+        public Maybe<TResult> Select<TResult>(Func<T, TResult> map) =>
+            HasValue ? map(Value).ToMaybe() : Maybe.None<TResult>();
     }
 
     public static class Maybe
     {
         public static Maybe<T> None<T>() => new Maybe<T>();
+
         public static Maybe<T> Some<T>(T value) => new Maybe<T>(value);
 
         public static Maybe<T> ToMaybe<T>(this T value) => value == null ? None<T>() : Some(value);

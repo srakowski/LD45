@@ -4,9 +4,9 @@ using WordGame.Logic;
 
 namespace WordGame.Scenes
 {
-    class MainMenuScene
+    class BossScene
     {
-        internal static Scene Create(Gameplay gp)
+        internal static Scene Create(Gameplay gameplay)
         {
             var scene = new Scene();
 

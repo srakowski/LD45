@@ -25,7 +25,7 @@ namespace Coldsteel
         {
             _entities.Add(entity);
             if (_engine != null)
-                entity.Activate(_engine, this);
+                entity.Activate(_engine, this, null);
             return this;
         }
 
@@ -54,7 +54,7 @@ namespace Coldsteel
             LoadContent();
 
             foreach (var entity in _entities.ToArray())
-                entity.Activate(engine, this);
+                entity.Activate(engine, this, null);
         }
 
         internal void Deactivate()

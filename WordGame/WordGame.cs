@@ -1,6 +1,5 @@
 ﻿using Coldsteel;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using WordGame.Logic;
 
@@ -10,13 +9,13 @@ namespace WordGame
     {
         GraphicsDeviceManager graphics;
         Engine engine;
-        Words ws;
+        Gameplay gameplay;
 
         public WordGame()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferHeight = 900;
-            graphics.PreferredBackBufferWidth = 1440;
+            graphics.PreferredBackBufferHeight = 1080;
+            graphics.PreferredBackBufferWidth = 1920;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -29,10 +28,8 @@ namespace WordGame
         protected override void Initialize()
         {
             base.Initialize();
-            ws = new Words();
-            ws.Initialize();
-            var gs = GameState.New(ws, "Xanatos");
-            engine.LoadScene("MainMenu", gs);
+            gameplay = new Gameplay();
+            engine.LoadScene(nameof(Scenes.TravelScene), gameplay);
         }
 
         protected override void Update(GameTime gameTime)

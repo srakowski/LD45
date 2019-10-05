@@ -1,4 +1,5 @@
 ﻿using Coldsteel;
+using System;
 using WordGame.Logic;
 
 namespace WordGame.Scenes
@@ -7,11 +8,19 @@ namespace WordGame.Scenes
     {
         public Scene Create(string sceneName, object param)
         {
-            if (sceneName == "MainMenu")
+            if (sceneName == nameof(MainMenuScene))
             {
-                return MainMenuScene.Create(param as GameState);
+                return MainMenuScene.Create(param as Gameplay);
             }
-            return null;
+            else if (sceneName == nameof(TravelScene))
+            {
+                return TravelScene.Create(param as Gameplay);
+            }
+            else if (sceneName == nameof(BossScene))
+            {
+                return BossScene.Create(param as Gameplay);
+            }
+            throw new NotImplementedException();
         }
     }
 }
