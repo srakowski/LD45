@@ -5,7 +5,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using WordGame.Logic;
+    using global::WordGame.Logic;
 
     public class Words : IWords
     {

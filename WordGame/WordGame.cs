@@ -1,21 +1,29 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Coldsteel;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using WordGame.Logic;
 
 namespace WordGame
 {
-    public class Game1 : Game
+    public class WordGame : Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        Engine engine;
         Words ws;
 
-        public Game1()
+        public WordGame()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferHeight = 900;
+            graphics.PreferredBackBufferWidth = 1440;
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            engine = new Engine(this, new EngineConfig(
+                new Scenes.SceneFactory(),
+                Controls.Create()
+            ));
         }
 
         protected override void Initialize()
@@ -24,11 +32,7 @@ namespace WordGame
             ws = new Words();
             ws.Initialize();
             GameState.New(ws);
-        }
-
-        protected override void LoadContent()
-        {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            engine.LoadScene("MainMenu");
         }
 
         protected override void Update(GameTime gameTime)
@@ -37,12 +41,6 @@ namespace WordGame
                 Exit();
 
             base.Update(gameTime);
-        }
-
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-            base.Draw(gameTime);
         }
     }
 }
