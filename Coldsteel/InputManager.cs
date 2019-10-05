@@ -12,6 +12,7 @@ namespace Coldsteel
 {
     internal class InputManager : GameComponent
     {
+        private static string windowInput;
         private readonly Engine _engine;
 
         public InputManager(Game game, Engine engine) : base(game)
@@ -27,6 +28,7 @@ namespace Coldsteel
                 new InputStates<GamePadState>(),
                 new InputStates<GamePadState>(),
             };
+            Game.Window.TextInput += Window_TextInput;
         }
 
         public static InputStates<KeyboardState> Keyboard;
@@ -36,6 +38,16 @@ namespace Coldsteel
         public static InputStates<GamePadState>[] GamePads;
 
         public static Vector2 CenterScreen;
+
+        public static string InputBuffer
+        {
+            get
+            {
+                var value = windowInput;
+                windowInput = "";
+                return value;
+            }
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -51,6 +63,11 @@ namespace Coldsteel
         private static void UpdateGamePadState(PlayerIndex playerIndex)
         {
             GamePads[(int)playerIndex] = GamePads[(int)playerIndex].Next(GP.GetState(playerIndex));
+        }
+
+        private void Window_TextInput(object sender, TextInputEventArgs e)
+        {
+            windowInput += e.Character;
         }
     }
 }

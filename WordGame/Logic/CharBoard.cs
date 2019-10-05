@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace WordGame.Logic
@@ -45,11 +46,17 @@ namespace WordGame.Logic
 
         internal Maybe<CharBoard> UndoLastSelection()
         {
-            if (NextSelectionIndex == 0) return Maybe.None<CharBoard>();
+            var mLastSelected = CharCells
+                .OrderByDescending(c => c.SelectionIndex.HasValue ? c.SelectionIndex.Value : -1)
+                .FirstOrDefault(v => v.SelectionIndex.HasValue)
+                .ToMaybe();
 
-            var lastSelected = CharCells
-                .OrderByDescending(c => c.SelectionIndex.HasValue ? c.SelectionIndex.Value : 0)
-                .First();
+            if (!mLastSelected.HasValue)
+            {
+                return Maybe.None<CharBoard>();
+            }
+
+            var lastSelected = mLastSelected.Value;
 
             var newCells = CharCells.Select(c => c == lastSelected ? lastSelected.Deselect() : c);
             return new CharBoard(newCells, PossibleWords, NextSelectionIndex - 1).ToMaybe();

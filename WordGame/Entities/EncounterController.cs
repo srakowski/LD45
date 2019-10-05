@@ -1,4 +1,5 @@
 ﻿using Coldsteel;
+using WordGame.Behaviors;
 using WordGame.Logic;
 
 namespace WordGame.Entities
@@ -10,6 +11,7 @@ namespace WordGame.Entities
         public EncounterController(Gameplay gameplay)
         {
             this.gameplay = gameplay;
+            AddComponent(new WordInput(gameplay));
         }
     }
 }

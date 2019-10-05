@@ -30,9 +30,10 @@ namespace Coldsteel.Controls
         {
         }
 
-        public void AddBinding(TBinding binding)
+        public Control AddBinding(TBinding binding)
         {
             _bindingsByPlayer[(int)binding.PlayerIndex].Add(binding);
+            return this;
         }
     }
 }

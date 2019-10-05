@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace WordGame.Logic
@@ -19,6 +20,8 @@ namespace WordGame.Logic
             AttemptResults = attemptResults;
             Player = player;
             Encounter = encounter;
+
+            Debug.WriteLine(string.Join("\n", CharBoard.PossibleWords.Select(c => c.Value).OrderBy(c => c.Length)));
         }
 
         public Words Words { get; }

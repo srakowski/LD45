@@ -7,7 +7,7 @@
 
         public const string ProtoFont = "ProtoFont";
 
-        public const int WordEntryMaxLetters = 9;
+        public const int WordEntryMaxLetters = 8;
         public const int WordEntryTileWidth = 80;
         public const int WordEntryTileHeight = 80;
 
