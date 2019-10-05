@@ -29,7 +29,9 @@ namespace WordGame.Entities
                 textSprite.Enabled = true;
                 var enemy = gameplay.ActiveEnemy.Value;
                 textSprite.Text =
-                    $"HP: {enemy.HP}\n";
+                    $"HP: {enemy.HP}/{enemy.MaxHP}\n" +
+                    $"OFF: {enemy.Off}\n" +
+                    $"DEF: {enemy.Def}\n";
             }
             else
             {

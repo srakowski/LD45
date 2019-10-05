@@ -23,7 +23,7 @@ namespace WordGame.Behaviors
         protected override void Initialize()
         {
             textInputControl = GetControl<TextInputControl>(Controls.LetterInput);
-            StartCoroutine(RunContinue());
+            StartCoroutine(StartEncounter());
         }
 
         private IEnumerator RunAttack()
@@ -68,9 +68,13 @@ namespace WordGame.Behaviors
             {
                 StartCoroutine(RunDefense());
             }
+            else if (gameplay.PlayerIsAlive)
+            {
+                StartCoroutine(RunBattleVictoryCondition());
+            }
             else
             {
-                StartCoroutine(RunContinue());
+                throw new NotImplementedException();
             }
         }
 
@@ -117,13 +121,35 @@ namespace WordGame.Behaviors
             {
                 StartCoroutine(RunAttack());
             }
+            else if (gameplay.PlayerIsAlive)
+            {
+                StartCoroutine(RunBattleVictoryCondition());
+            }
             else
             {
-                StartCoroutine(RunContinue());
+                throw new NotImplementedException();
             }
         }
 
-        private IEnumerator RunContinue()
+        private IEnumerator RunBattleVictoryCondition()
+        {
+            statusSprite.Text = "Victory";
+
+            while (true)
+            {
+                var data = textInputControl.InputBuffer();
+                if (data.Any(c => c == '\r'))
+                {
+                    gameplay.CollectLoot();
+                    break;
+                }
+                yield return Wait.None();
+            }
+
+            StartCoroutine(StartEncounter());
+        }
+
+        private IEnumerator StartEncounter()
         {
             statusSprite.Text = "Continue";
             while (true)

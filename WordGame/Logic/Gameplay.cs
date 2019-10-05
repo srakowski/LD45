@@ -56,6 +56,12 @@ namespace WordGame.Logic
             return HandleUpdateResult(result);
         }
 
+        internal bool CollectLoot()
+        {
+            var result = CurrentState.CollectWinnings();
+            return HandleUpdateResult(result);
+        }
+
         public bool Fail()
         {
             return true;

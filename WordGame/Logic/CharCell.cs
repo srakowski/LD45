@@ -31,11 +31,11 @@ namespace WordGame.Logic
 
         public CharCell WithLoot(Random random, Encounter value)
         {
-            var item = Logic.Item.CreateLoot(random, value.ActiveEnemy.Select(a => a.Tier).ValueOr(() => 1));
+            var item = Logic.Item.CreateLoot(random);
             return new CharCell(
                 Value,
                 SelectionIndex,
-                Item
+                item
                 );
         }
     }

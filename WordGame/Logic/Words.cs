@@ -37,7 +37,7 @@
             return _wordsByStartsWith[startsWith.Value].Select(v => new Word(v));
         }
 
-        public StartsWith GetNextStartsWith(int seed, Maybe<Word> foundWord)
+        public StartsWith GetNextStartsWith(Random random, Maybe<Word> foundWord)
         {
             if (foundWord.HasValue)
             {
@@ -50,15 +50,14 @@
                 }
             }
 
-            var r = new Random(seed);
             var next = _wordsByStartsWith.Keys
                 .Select(k => new
                 {
                     Key = k,
-                    Board = CharBoard.ConstructBoard(_wordsByStartsWith[k].Select(x => new Word(x)), r),
+                    Board = CharBoard.ConstructBoard(_wordsByStartsWith[k].Select(x => new Word(x)), random),
                 })
                 .Where(b => b.Board.CharCells.Count() >= 16)
-                .OrderByDescending(_ => r.Next())
+                .OrderByDescending(_ => random.Next())
                 .Select(k => k.Key)
                 .First();
 

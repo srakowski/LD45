@@ -8,23 +8,29 @@ namespace WordGame.Logic
     public class GameState
     {
         private GameState(
+            Random random,
             Words words,
             StartsWith startsWith,
             CharBoard charBoard,
             IEnumerable<AttemptResult> attemptResults,
             Player player,
             Encounter encounter,
-            IEnumerable<Item> itemsEscrow)
+            IEnumerable<Item> itemsEscrow,
+            int xpEscrow)
         {
+            Random = random;
             Words = words;
             StartsWith = startsWith;
             CharBoard = charBoard;
             AttemptResults = attemptResults;
             Player = player;
             Encounter = encounter;
-            ItemsEscrow = itemsEscrow;
+            LootEscrow = itemsEscrow;
+            XPEscrow = xpEscrow;
             // Debug.WriteLine(string.Join("\n", CharBoard.PossibleWords.Select(c => c.Value).OrderBy(c => c.Length)));
         }
+
+        public Random Random { get; }
 
         public Words Words { get; }
 
@@ -46,20 +52,25 @@ namespace WordGame.Logic
 
         public Maybe<Enemy> ActiveEnemy => Encounter.ActiveEnemy;
 
-        public IEnumerable<Item> ItemsEscrow { get; }
+        public IEnumerable<Item> LootEscrow { get; }
+
+        public int XPEscrow { get; }
 
         public static GameState New(Words words, string playerName)
         {
+            var random = new Random(23);
             var startsWith = new StartsWith('n', 'o');
-            var charBoard = CharBoard.New(words, startsWith, "nothing");
+            var charBoard = CharBoard.New(random, words, startsWith, "nothing");
             return new GameState(
+                random,
                 words,
                 startsWith,
                 charBoard,
                 Enumerable.Empty<AttemptResult>(),
-                Player.New(playerName),
-                Encounters.EnterDungeon(),
-                Enumerable.Empty<Item>()
+                Player.New(playerName, random),
+                Encounters.EnterDungeon(random),
+                Enumerable.Empty<Item>(),
+                0
             );
         }
 
@@ -73,13 +84,15 @@ namespace WordGame.Logic
             }
 
             return new GameState(
+                Random,
                 Words,
                 StartsWith,
                 maybeCharBoard.Value,
                 AttemptResults,
                 Player,
                 Encounter,
-                ItemsEscrow).ToMaybe();
+                LootEscrow,
+                XPEscrow).ToMaybe();
         }
 
         public Maybe<GameState> UndoLastSelection()
@@ -92,13 +105,15 @@ namespace WordGame.Logic
             }
 
             return new GameState(
+                Random,
                 Words,
                 StartsWith,
                 maybeCharBoard.Value,
                 AttemptResults,
                 Player,
                 Encounter,
-                ItemsEscrow).ToMaybe();
+                LootEscrow,
+                XPEscrow).ToMaybe();
         }
 
         public Maybe<GameState> CompleteWord(CombatMode mode)
@@ -119,46 +134,61 @@ namespace WordGame.Logic
             var encounter = Encounter;
             var player = Player;
 
-            var items = ItemsEscrow;
+            var items = LootEscrow;
+            var xp = XPEscrow;
 
             if (attemptResult is AttemptResult.SuccessResult)
             {
                 if (mode == CombatMode.Attack)
                 {
-                    encounter = Encounter.TakeDamage(Player.AttackDamage);
+                    encounter = Encounter.TakeMitigatedDamage(Player.AttackDamage(Random, word.Value.Length));
                 }
                 else if (mode == CombatMode.Defense)
                 {
-                    var enemyAttack = encounter.ActiveEnemy.Select(e => e.AttackDamage).ValueOr(() => 0);
-                    player = Player.TakePartialDamage(enemyAttack);
+                    var enemyAttack = encounter.ActiveEnemy.Select(e => e.AttackDamage(Random, -word.Value.Length)).ValueOr(() => 0);
+                    player = Player.TakeMitigatedDamage(enemyAttack);
                 }
 
                 items = items.Concat(CharBoard.CollectItems());
+                xp += word.Value.Length;
             }
             else
             {
                 if (mode == CombatMode.Defense)
                 {
-                    var enemyAttack = encounter.ActiveEnemy.Select(e => e.AttackDamage).ValueOr(() => 0);
-                    player = Player.TakeDamage(enemyAttack);
-                }
-                else if (mode == CombatMode.Attack)
-                {
-                    encounter = Encounter.TakePartialDamage(Player.AttackDamage);
+                    var enemyAttack = encounter.ActiveEnemy.Select(e => e.AttackDamage(Random, word.Value.Length)).ValueOr(() => 0);
+                    player = Player.TakeMitigatedDamage(enemyAttack);
                 }
             }
 
-            var nextStartsWith = Words.GetNextStartsWith(seed, attemptResult is AttemptResult.SuccessResult ? word.ToMaybe() : Maybe.None<Word>());
+            var nextStartsWith = Words.GetNextStartsWith(Random, attemptResult is AttemptResult.SuccessResult ? word.ToMaybe() : Maybe.None<Word>());
 
             return new GameState(
+                Random,
                 Words,
                 nextStartsWith,
-                CharBoard.New(Words, nextStartsWith),
+                CharBoard.New(Random, Words, nextStartsWith),
                 AttemptResults.Prepend(attemptResult),
                 player,
                 encounter,
-                items
+                items,
+                xp
             ).ToMaybe();
+        }
+
+        public Maybe<GameState> CollectWinnings()
+        {
+            return new GameState(
+                Random,
+                Words,
+                StartsWith,
+                CharBoard,
+                AttemptResults,
+                Player.Progress(XPEscrow, LootEscrow),
+                Encounter,
+                Enumerable.Empty<Item>(),
+                0
+                ).ToMaybe();
         }
 
         public Maybe<GameState> LoadNextEnemy()
@@ -169,16 +199,18 @@ namespace WordGame.Logic
                 return Maybe.None<GameState>();
             }
 
-            var newCharBoard = CharBoard.CreateLoot(encounter.Value);
+            var newCharBoard = CharBoard.CreateLoot(Random, encounter.Value);
 
             return new GameState(
+                Random,
                 Words,
                 StartsWith,
                 newCharBoard,
                 AttemptResults,
                 Player,
                 encounter.Value,
-                ItemsEscrow).ToMaybe();
+                LootEscrow,
+                XPEscrow).ToMaybe();
         }
     }
 }

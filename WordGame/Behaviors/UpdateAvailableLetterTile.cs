@@ -32,7 +32,11 @@ namespace WordGame.Behaviors
         {
             sprite.Text = gameplay.CurrentState.CharBoard
                 .CharCells
-                .Select(c => c.IsSelected ? '_' : c.Value)
+                .Select(c => c.IsSelected
+                    ? c.Item.HasValue
+                        ? '&' 
+                        : '_'
+                    : c.Value)
                 .ElementAt(index)
                 .ToString()
                 .ToUpper();

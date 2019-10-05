@@ -21,7 +21,14 @@ namespace WordGame.Logic
 
         public bool HasLivingEnemies => ActiveEnemy.HasValue || EnemyQueue.Any();
 
-        public Encounter TakeDamage(int points)
+        public Encounter TakeMitigatedDamage(int points)
+        {
+            var modifier = Constants.DmgMod / (Constants.DmgMod + ActiveEnemy.Select(e => e.AttackDefense).ValueOr(() => 0));
+            var effectivePoints = (int)(points * modifier);
+            return TakeDamage(effectivePoints);
+        }
+
+        private Encounter TakeDamage(int points)
         {
             if (!ActiveEnemy.HasValue)
             {
@@ -31,14 +38,6 @@ namespace WordGame.Logic
             var ae = ActiveEnemy.Value;
             var dae = ae.TakeDamage(points);
             return new Encounter(dae, EnemyQueue);
-        }
-
-        public Encounter TakePartialDamage(int points)
-        {
-            var effectivePoints = ActiveEnemy
-                .Select(e => Math.Clamp(points - e.AttackDefense, 0, int.MaxValue))
-                .ValueOr(() => points);
-            return TakeDamage(effectivePoints);
         }
 
         public Maybe<Encounter> LoadNextEnemy()

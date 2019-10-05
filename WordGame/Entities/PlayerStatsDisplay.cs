@@ -1,5 +1,6 @@
 ﻿using Coldsteel;
 using Microsoft.Xna.Framework;
+using System.Linq;
 using WordGame.Behaviors;
 using WordGame.Logic;
 
@@ -25,7 +26,12 @@ namespace WordGame.Entities
         {
             var player = gameplay.Player;
             textSprite.Text =
-                $"HP: {player.HP}\n";
+                $"HP:  {player.HP}/{player.MaxHP}\n" +
+                $"OFF: {player.Off}\n" +
+                $"DEF: {player.Def}\n" +
+                $"\n" +
+                $"Inventory:" +
+                $"\n- {string.Join("\n- ", player.Inventory.Select(i => i.Name))}";
         }
     }
 }

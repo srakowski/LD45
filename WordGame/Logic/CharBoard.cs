@@ -6,15 +6,12 @@ namespace WordGame.Logic
 {
     public class CharBoard
     {
-        private CharBoard(Random rand, IEnumerable<CharCell> charCells, IEnumerable<Word> possibleWords, int nextSelectionIndex)
+        private CharBoard(IEnumerable<CharCell> charCells, IEnumerable<Word> possibleWords, int nextSelectionIndex)
         {
-            Rand = rand;
             CharCells = charCells.ToArray();
             PossibleWords = possibleWords;
             NextSelectionIndex = nextSelectionIndex;
         }
-
-        public Random Rand { get; }
 
         public IEnumerable<CharCell> CharCells { get; }
 
@@ -40,7 +37,7 @@ namespace WordGame.Logic
             {
                 var newCell = maybeOpenCell.Value.Select(NextSelectionIndex);
                 var newCells = CharCells.Select(c => c == maybeOpenCell.Value ? newCell : c);
-                return new CharBoard(Rand, newCells, PossibleWords, NextSelectionIndex + 1).ToMaybe();
+                return new CharBoard(newCells, PossibleWords, NextSelectionIndex + 1).ToMaybe();
             }
 
             return Maybe.None<CharBoard>();
@@ -61,7 +58,7 @@ namespace WordGame.Logic
             var lastSelected = mLastSelected.Value;
 
             var newCells = CharCells.Select(c => c == lastSelected ? lastSelected.Deselect() : c);
-            return new CharBoard(Rand, newCells, PossibleWords, NextSelectionIndex - 1).ToMaybe();
+            return new CharBoard(newCells, PossibleWords, NextSelectionIndex - 1).ToMaybe();
         }
 
         public bool HasWord(Word word)
@@ -75,10 +72,10 @@ namespace WordGame.Logic
             return CharCells.FirstOrDefault(cs => cs.SelectionIndex.ValueOr(() => -1) == selectionIndex).ToMaybe();
         }
 
-        public static CharBoard New(Words words, StartsWith startsWith, Word forceInclude = null)
+        public static CharBoard New(Random random, Words words, StartsWith startsWith, Word forceInclude = null)
         {
             var wordSet = words.GetWordsThatStartWith(startsWith);
-            return ConstructBoard(wordSet, new Random(23), forceInclude);
+            return ConstructBoard(wordSet, random, forceInclude);
         }
 
         public static CharBoard ConstructBoard(IEnumerable<Word> wordSet, Random random, Word forceInclude = null)
@@ -93,7 +90,6 @@ namespace WordGame.Logic
             var possibleWords = GetPossibleWords(characters, wordSet);
 
             return new CharBoard(
-                random,
                 characters.Select(c => new CharCell(c, Maybe.None<int>(), Maybe.None<Item>())).ToArray(),
                 possibleWords,
                 0
@@ -142,11 +138,10 @@ namespace WordGame.Logic
                 );
         }
 
-        public CharBoard CreateLoot(Encounter value)
+        public CharBoard CreateLoot(Random random, Encounter value)
         {
             return new CharBoard(
-                Rand,
-                CharCells.Select(c => c.WithLoot(Rand, value)),
+                CharCells.Select(c => c.WithLoot(random, value)),
                 PossibleWords,
                 NextSelectionIndex
                 );
