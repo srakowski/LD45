@@ -9,12 +9,16 @@ namespace WordGame.Logic
             IWords words,
             StartsWith startsWith,
             CharBoard charBoard,
-            IEnumerable<AttemptResult> attemptResults)
+            IEnumerable<AttemptResult> attemptResults,
+            Player player,
+            Encounter encounter)
         {
             Words = words;
             StartsWith = startsWith;
             CharBoard = charBoard;
             AttemptResults = attemptResults;
+            Player = player;
+            Encounter = encounter;
         }
 
         public IWords Words { get; }
@@ -25,7 +29,12 @@ namespace WordGame.Logic
 
         public IEnumerable<AttemptResult> AttemptResults { get; }
 
-        public static GameState New(IWords words)
+        public Player Player { get; }
+
+
+        public Encounter Encounter { get; }
+
+        public static GameState New(IWords words, string playerName)
         {
             var startsWith = new StartsWith('n', 'o');
             var charBoard = CharBoard.New(words, startsWith, "nothing");
@@ -33,7 +42,9 @@ namespace WordGame.Logic
                 words,
                 startsWith,
                 charBoard,
-                Enumerable.Empty<AttemptResult>()
+                Enumerable.Empty<AttemptResult>(),
+                Player.New(playerName),
+                new Encounters.EnterGame()
             );
         }
 
@@ -50,8 +61,9 @@ namespace WordGame.Logic
                 Words,
                 StartsWith,
                 maybeCharBoard.Value,
-                AttemptResults
-                ).ToMaybe();
+                AttemptResults,
+                Player,
+                Encounter).ToMaybe();
         }
 
         public Maybe<GameState> UndoLastSelection()
@@ -67,8 +79,9 @@ namespace WordGame.Logic
                 Words,
                 StartsWith,
                 maybeCharBoard.Value,
-                AttemptResults
-                ).ToMaybe();
+                AttemptResults,
+                Player,
+                Encounter).ToMaybe();
         }
 
         public Maybe<GameState> CompleteWord()
@@ -86,13 +99,28 @@ namespace WordGame.Logic
                 ? AttemptResult.Success(word.Value)
                 : AttemptResult.Failure(word.Value);
 
+            var combatValue = CharBoard.GetCombatValue();
+
+            var encounter = Encounter;
+            var player = Player;
+            if (attemptResult is AttemptResult.SuccessResult)
+            {
+                encounter = Encounter.TakeDamage(combatValue);
+            }
+            else
+            {
+                player = Player.TakeDamage(combatValue);
+            }
+
             var nextStartsWith = Words.GetNextStartsWith(seed, attemptResult is AttemptResult.SuccessResult ? word.ToMaybe() : Maybe.None<Word>());
 
             return new GameState(
                 Words,
                 nextStartsWith,
                 CharBoard.New(Words, nextStartsWith),
-                AttemptResults.Prepend(attemptResult)
+                AttemptResults.Prepend(attemptResult),
+                player,
+                encounter
             ).ToMaybe();
         }
     }

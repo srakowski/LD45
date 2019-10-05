@@ -24,9 +24,9 @@ namespace Coldsteel
 
         public Scene ActiveScene => _activeScene;
 
-        internal void LoadScene(string sceneName)
+        internal void LoadScene(string sceneName, object param)
         {
-            var scene = _sceneFactory.Create(sceneName);
+            var scene = _sceneFactory.Create(sceneName, param);
             _pendingScene = scene;
         }
 

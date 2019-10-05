@@ -32,9 +32,9 @@ namespace Coldsteel
 
         internal SpriteSystem SpriteSystem;
 
-        public void LoadScene(string sceneName)
+        public void LoadScene(string sceneName, object param)
         {
-            SceneManager.LoadScene(sceneName);
+            SceneManager.LoadScene(sceneName, param);
         }
     }
 }

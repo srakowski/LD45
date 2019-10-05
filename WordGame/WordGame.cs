@@ -31,8 +31,8 @@ namespace WordGame
             base.Initialize();
             ws = new Words();
             ws.Initialize();
-            GameState.New(ws);
-            engine.LoadScene("MainMenu");
+            var gs = GameState.New(ws, "Xanatos");
+            engine.LoadScene("MainMenu", gs);
         }
 
         protected override void Update(GameTime gameTime)

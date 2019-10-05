@@ -78,11 +78,13 @@ namespace WordGame.Logic
             var possibleWords = GetPossibleWords(characters, wordSet);
 
             return new CharBoard(
-                characters.Select(c => new CharCell(c, Maybe.None<int>())).ToArray(),
+                characters.Select(c => new CharCell(c, (random?.Next(6) ?? 0) + 1, Maybe.None<int>())).ToArray(),
                 possibleWords,
                 0
                 );
         }
+
+        public int GetCombatValue() => CharCells.Where(c => c.IsSelected).Sum(c => c.CombatValue);
 
         private static IEnumerable<char> AddWord(IEnumerable<char> collection, Word word)
         {

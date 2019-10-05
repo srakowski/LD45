@@ -6,6 +6,6 @@ namespace Coldsteel
 {
     public interface ISceneFactory
     {
-        Scene Create(string sceneName);
+        Scene Create(string sceneName, object param);
     }
 }

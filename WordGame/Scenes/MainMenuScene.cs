@@ -1,11 +1,12 @@
 ﻿using Coldsteel;
 using Microsoft.Xna.Framework.Graphics;
+using WordGame.Logic;
 
 namespace WordGame.Scenes
 {
     class MainMenuScene
     {
-        internal static Scene Create()
+        internal static Scene Create(GameState gs)
         {
             var scene = new Scene();
 
