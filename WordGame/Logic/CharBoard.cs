@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace WordGame.Logic
 {
     public class CharBoard
     {
-        private CharBoard(IEnumerable<CharCell> charCells, IEnumerable<Word> possibleWords, int nextSelectionIndex)
+        private CharBoard(Random rand, IEnumerable<CharCell> charCells, IEnumerable<Word> possibleWords, int nextSelectionIndex)
         {
+            Rand = rand;
             CharCells = charCells.ToArray();
             PossibleWords = possibleWords;
             NextSelectionIndex = nextSelectionIndex;
         }
+
+        public Random Rand { get; }
 
         public IEnumerable<CharCell> CharCells { get; }
 
@@ -38,7 +40,7 @@ namespace WordGame.Logic
             {
                 var newCell = maybeOpenCell.Value.Select(NextSelectionIndex);
                 var newCells = CharCells.Select(c => c == maybeOpenCell.Value ? newCell : c);
-                return new CharBoard(newCells, PossibleWords, NextSelectionIndex + 1).ToMaybe();
+                return new CharBoard(Rand, newCells, PossibleWords, NextSelectionIndex + 1).ToMaybe();
             }
 
             return Maybe.None<CharBoard>();
@@ -59,7 +61,7 @@ namespace WordGame.Logic
             var lastSelected = mLastSelected.Value;
 
             var newCells = CharCells.Select(c => c == lastSelected ? lastSelected.Deselect() : c);
-            return new CharBoard(newCells, PossibleWords, NextSelectionIndex - 1).ToMaybe();
+            return new CharBoard(Rand, newCells, PossibleWords, NextSelectionIndex - 1).ToMaybe();
         }
 
         public bool HasWord(Word word)
@@ -91,13 +93,17 @@ namespace WordGame.Logic
             var possibleWords = GetPossibleWords(characters, wordSet);
 
             return new CharBoard(
-                characters.Select(c => new CharCell(c, (random?.Next(6) ?? 0) + 1, Maybe.None<int>())).ToArray(),
+                random,
+                characters.Select(c => new CharCell(c, Maybe.None<int>(), Maybe.None<Item>())).ToArray(),
                 possibleWords,
                 0
                 );
         }
 
-        public int GetCombatValue() => EndsWith.Length;
+        public IEnumerable<Item> CollectItems()
+        {
+            return CharCells.Where(c => c.IsSelected && c.Item.HasValue).Select(c => c.Item.Value).ToArray();
+        }
 
         private static IEnumerable<char> AddWord(IEnumerable<char> collection, Word word)
         {
@@ -133,6 +139,16 @@ namespace WordGame.Logic
                 .ToDictionary(
                     k => k.Key,
                     v => v.Count()
+                );
+        }
+
+        public CharBoard CreateLoot(Encounter value)
+        {
+            return new CharBoard(
+                Rand,
+                CharCells.Select(c => c.WithLoot(Rand, value)),
+                PossibleWords,
+                NextSelectionIndex
                 );
         }
     }

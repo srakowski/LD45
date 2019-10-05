@@ -13,7 +13,8 @@ namespace WordGame.Logic
             int level,
             int str,
             int def,
-            Weapon weapon,
+            Maybe<Weapon> weapon,
+            Maybe<Armor> armor,
             IEnumerable<Item> inventory)
         {
             Name = name;
@@ -23,10 +24,11 @@ namespace WordGame.Logic
             Str = str;
             Def = def;
             Weapon = weapon;
+            Armor = armor;
             Inventory = inventory;
         }
 
-        private Player(Player player, int? hp = null)
+        private Player(string playerName, Player player, int? hp = null)
         {
             Name = player.Name;
             HP = hp ?? player.HP;
@@ -35,6 +37,7 @@ namespace WordGame.Logic
             Str = player.Str;
             Def = player.Def;
             Weapon = player.Weapon;
+            Armor = player.Armor;
             Inventory = player.Inventory;
         }
 
@@ -48,9 +51,15 @@ namespace WordGame.Logic
 
         public int Str { get; }
 
+        public int AttackDamage => Str;
+
         public int Def { get; }
 
-        public Weapon Weapon { get; }
+        public int AttackDefense => Def;
+
+        public Maybe<Weapon> Weapon { get; }
+
+        public Maybe<Armor> Armor { get; }
 
         public IEnumerable<Item> Inventory { get; }
 
@@ -58,19 +67,27 @@ namespace WordGame.Logic
 
         public static Player New(string playerName)
         {
-            return new Player(playerName,
+            return new Player(
+                playerName,
                 Constants.StartingHP, 
                 0,
                 1,
                 1,
                 1,
-                new Weapons.None(),
+                Maybe.None<Weapon>(),
+                Maybe.None<Armor>(),
                 Enumerable.Empty<Item>());
         }
 
-        public Player TakeDamage(int combatValue)
+        public Player TakeDamage(int points)
         {
-            return new Player(this, hp: Math.Clamp(HP - combatValue, 0, int.MaxValue));
+            return new Player(Name, this, hp: Math.Clamp(HP - points, 0, int.MaxValue));
+        }
+
+        public Player TakePartialDamage(int points)
+        {
+            var effectivePoints = Math.Clamp(points - AttackDefense, 0, int.MaxValue);
+            return TakeDamage(effectivePoints);
         }
     }
 }

@@ -13,7 +13,8 @@ namespace WordGame.Logic
             CharBoard charBoard,
             IEnumerable<AttemptResult> attemptResults,
             Player player,
-            Encounter encounter)
+            Encounter encounter,
+            IEnumerable<Item> itemsEscrow)
         {
             Words = words;
             StartsWith = startsWith;
@@ -21,7 +22,7 @@ namespace WordGame.Logic
             AttemptResults = attemptResults;
             Player = player;
             Encounter = encounter;
-
+            ItemsEscrow = itemsEscrow;
             // Debug.WriteLine(string.Join("\n", CharBoard.PossibleWords.Select(c => c.Value).OrderBy(c => c.Length)));
         }
 
@@ -45,6 +46,8 @@ namespace WordGame.Logic
 
         public Maybe<Enemy> ActiveEnemy => Encounter.ActiveEnemy;
 
+        public IEnumerable<Item> ItemsEscrow { get; }
+
         public static GameState New(Words words, string playerName)
         {
             var startsWith = new StartsWith('n', 'o');
@@ -55,7 +58,8 @@ namespace WordGame.Logic
                 charBoard,
                 Enumerable.Empty<AttemptResult>(),
                 Player.New(playerName),
-                Encounters.EnterDungeon()
+                Encounters.EnterDungeon(),
+                Enumerable.Empty<Item>()
             );
         }
 
@@ -74,7 +78,8 @@ namespace WordGame.Logic
                 maybeCharBoard.Value,
                 AttemptResults,
                 Player,
-                Encounter).ToMaybe();
+                Encounter,
+                ItemsEscrow).ToMaybe();
         }
 
         public Maybe<GameState> UndoLastSelection()
@@ -92,7 +97,8 @@ namespace WordGame.Logic
                 maybeCharBoard.Value,
                 AttemptResults,
                 Player,
-                Encounter).ToMaybe();
+                Encounter,
+                ItemsEscrow).ToMaybe();
         }
 
         public Maybe<GameState> CompleteWord(CombatMode mode)
@@ -110,23 +116,35 @@ namespace WordGame.Logic
                 ? AttemptResult.Success(word.Value)
                 : AttemptResult.Failure(word.Value);
 
-            var combatValue = CharBoard.GetCombatValue();
-
             var encounter = Encounter;
             var player = Player;
+
+            var items = ItemsEscrow;
 
             if (attemptResult is AttemptResult.SuccessResult)
             {
                 if (mode == CombatMode.Attack)
                 {
-                    encounter = Encounter.TakeDamage(combatValue);
+                    encounter = Encounter.TakeDamage(Player.AttackDamage);
                 }
+                else if (mode == CombatMode.Defense)
+                {
+                    var enemyAttack = encounter.ActiveEnemy.Select(e => e.AttackDamage).ValueOr(() => 0);
+                    player = Player.TakePartialDamage(enemyAttack);
+                }
+
+                items = items.Concat(CharBoard.CollectItems());
             }
             else
             {
                 if (mode == CombatMode.Defense)
                 {
-                    player = Player.TakeDamage(combatValue);
+                    var enemyAttack = encounter.ActiveEnemy.Select(e => e.AttackDamage).ValueOr(() => 0);
+                    player = Player.TakeDamage(enemyAttack);
+                }
+                else if (mode == CombatMode.Attack)
+                {
+                    encounter = Encounter.TakePartialDamage(Player.AttackDamage);
                 }
             }
 
@@ -138,7 +156,8 @@ namespace WordGame.Logic
                 CharBoard.New(Words, nextStartsWith),
                 AttemptResults.Prepend(attemptResult),
                 player,
-                encounter
+                encounter,
+                items
             ).ToMaybe();
         }
 
@@ -149,14 +168,17 @@ namespace WordGame.Logic
             {
                 return Maybe.None<GameState>();
             }
+
+            var newCharBoard = CharBoard.CreateLoot(encounter.Value);
+
             return new GameState(
                 Words,
                 StartsWith,
-                CharBoard,
+                newCharBoard,
                 AttemptResults,
                 Player,
-                encounter.Value
-                ).ToMaybe();
+                encounter.Value,
+                ItemsEscrow).ToMaybe();
         }
     }
 }

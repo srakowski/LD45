@@ -5,11 +5,12 @@
         public static Encounter EnterDungeon()
         {
             return new Encounter(
-                new Enemy("Bat", 3).ToMaybe<Enemy>(),
+                Maybe.None<Enemy>(),
                 new[]
                 {
-                    new Enemy("Racoon", 5),
-                    new Enemy("Donkey", 8),
+                    new Enemy("Bat", 4, 1, 1),
+                    new Enemy("Racoon", 5, 1, 1),
+                    new Enemy("Donkey", 6, 2, 2),
                 }
             );
         }

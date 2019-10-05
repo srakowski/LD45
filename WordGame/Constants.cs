@@ -11,6 +11,8 @@
         public const int WordEntryTileWidth = 80;
         public const int WordEntryTileHeight = 80;
 
-        public const int StartingHP = 10;
+        public const int StartingHP = 4;
+
+        public const int TimeToGuessInSecs = 10;
     }
 }

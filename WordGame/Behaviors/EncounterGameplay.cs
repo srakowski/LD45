@@ -1,5 +1,6 @@
 ﻿using Coldsteel;
 using Coldsteel.Controls;
+using System;
 using System.Collections;
 using System.Linq;
 using WordGame.Logic;
@@ -11,6 +12,7 @@ namespace WordGame.Behaviors
         private Gameplay gameplay;
         private TextInputControl textInputControl;
         private TextSprite statusSprite;
+        private double timeLeft;
 
         public EncounterGameplay(Gameplay gameplay, TextSprite statusSprite)
         {
@@ -21,100 +23,138 @@ namespace WordGame.Behaviors
         protected override void Initialize()
         {
             textInputControl = GetControl<TextInputControl>(Controls.LetterInput);
-            StartCoroutine(RunEncounter());
+            StartCoroutine(RunContinue());
         }
 
-        public IEnumerator RunEncounter()
+        private IEnumerator RunAttack()
         {
-            while (gameplay.EncounterIsActive && gameplay.PlayerIsAlive)
+            var timer = StartCoroutine(RunTimer());
+            while (true)
             {
-                while (gameplay.PlayerIsAlive && gameplay.EnemyIsAlive)
+                statusSprite.Text = $"Attack {Math.Clamp((int)(timeLeft / 1000), 0, 9)}";
+                bool done = false;
+                var data = textInputControl.InputBuffer();
+                var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
+                foreach (var c in enteredLetters)
                 {
-                    statusSprite.Text = "Attack";
-                    while (!RunAttack())
+                    if (c == '\b')
                     {
-                        yield return Wait.None();
+                        gameplay.UndoLastSelection();
                     }
-
-                    if (!gameplay.PlayerIsAlive || !gameplay.EnemyIsAlive)
+                    else if (c == '\r')
+                    {
+                        done = gameplay.Attack();
                         break;
-
-                    statusSprite.Text = "Defend";
-                    while (!RunDefense())
+                    }
+                    else
                     {
-                        yield return Wait.None();
+                        gameplay.MakeAutoLetterSelection(c);
                     }
                 }
+                if (done) break;
 
-                if (gameplay.PlayerIsAlive)
+                if (timer.IsFinished)
                 {
-                    statusSprite.Text = "Continue";
-                    while (!RunContinue())
+                    gameplay.Fail();
+                    break;
+                }
+
+                yield return Wait.None();
+            }
+
+            timer.Abort();
+
+            if (gameplay.PlayerIsAlive && gameplay.EnemyIsAlive)
+            {
+                StartCoroutine(RunDefense());
+            }
+            else
+            {
+                StartCoroutine(RunContinue());
+            }
+        }
+
+        private IEnumerator RunDefense()
+        {
+            var timer = StartCoroutine(RunTimer());
+            statusSprite.Text = "Defend";
+            while (true)
+            {
+                statusSprite.Text = $"Defend {Math.Clamp((int)(timeLeft / 1000), 0, 9)}";
+                var done = false;
+                var data = textInputControl.InputBuffer();
+                var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
+                foreach (var c in enteredLetters)
+                {
+                    if (c == '\b')
                     {
-                        yield return Wait.None();
+                        gameplay.UndoLastSelection();
+                    }
+                    else if (c == '\r')
+                    {
+                        done = gameplay.Defend();
+                        break;
+                    }
+                    else
+                    {
+                        gameplay.MakeAutoLetterSelection(c);
                     }
                 }
-            }
-        }
+                if (done) break;
 
-        private bool RunAttack()
-        {
-            bool done = false;
-            var data = textInputControl.InputBuffer();
-            var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
-            foreach (var c in enteredLetters)
-            {
-                if (c == '\b')
+                if (timer.IsFinished)
                 {
-                    gameplay.UndoLastSelection();
-                }
-                else if (c == '\r')
-                {
-                    done = gameplay.Attack();
+                    gameplay.Fail();
                     break;
                 }
-                else
-                {
-                    gameplay.MakeAutoLetterSelection(c);
-                }
+
+                yield return Wait.None();
             }
-            return done;
+
+            timer.Abort();
+
+            if (gameplay.PlayerIsAlive && gameplay.EnemyIsAlive)
+            {
+                StartCoroutine(RunAttack());
+            }
+            else
+            {
+                StartCoroutine(RunContinue());
+            }
         }
 
-        private bool RunDefense()
+        private IEnumerator RunContinue()
         {
-            bool done = false;
-            var data = textInputControl.InputBuffer();
-            var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
-            foreach (var c in enteredLetters)
+            statusSprite.Text = "Continue";
+            while (true)
             {
-                if (c == '\b')
+                var data = textInputControl.InputBuffer();
+                if (data.Any(c => c == '\r'))
                 {
-                    gameplay.UndoLastSelection();
-                }
-                else if (c == '\r')
-                {
-                    done = gameplay.Defend();
+                    gameplay.LoadNextEnemy();
                     break;
                 }
-                else
-                {
-                    gameplay.MakeAutoLetterSelection(c);
-                }
+                yield return Wait.None();
             }
-            return done;
+
+            if (gameplay.EncounterIsActive && gameplay.PlayerIsAlive)
+            {
+                StartCoroutine(RunAttack());
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        private bool RunContinue()
+        private IEnumerator RunTimer()
         {
-            var done = false;
-            var data = textInputControl.InputBuffer();
-            if (data.Any(c => c == '\r'))
+            timeLeft = (Constants.TimeToGuessInSecs * 1000);
+            while (timeLeft > 0)
             {
-                gameplay.LoadNextEnemy();
-                done = true;
+                timeLeft -= Delta;
+                yield return Wait.None();
             }
-            return done;
         }
     }
 }

@@ -52,13 +52,14 @@
 
             var r = new Random(seed);
             var next = _wordsByStartsWith.Keys
-                .OrderByDescending(s =>
+                .Select(k => new
                 {
-                    var set = _wordsByStartsWith[s];
-                    return CharBoard.ConstructBoard(set.Select(x => new Word(x)), r).PossibleWords.Count();
+                    Key = k,
+                    Board = CharBoard.ConstructBoard(_wordsByStartsWith[k].Select(x => new Word(x)), r),
                 })
-                .Take(100)
+                .Where(b => b.Board.CharCells.Count() >= 16)
                 .OrderByDescending(_ => r.Next())
+                .Select(k => k.Key)
                 .First();
 
             return new StartsWith(next[0], next[1]);

@@ -1,6 +1,6 @@
 ﻿namespace WordGame.Logic
 {
-    public abstract class Weapon : Item
+    public class Armor : Item
     {
     }
 }

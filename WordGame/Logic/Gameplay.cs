@@ -56,6 +56,11 @@ namespace WordGame.Logic
             return HandleUpdateResult(result);
         }
 
+        public bool Fail()
+        {
+            return true;
+        }
+
         private bool HandleUpdateResult(Maybe<GameState> result)
         {
             if (!result.HasValue)

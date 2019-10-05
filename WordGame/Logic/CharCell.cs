@@ -4,29 +4,39 @@ namespace WordGame.Logic
 {
     public class CharCell
     {
-        public CharCell(char value, int combatValue, Maybe<int> selectionIndex)
+        public CharCell(char value, Maybe<int> selectionIndex, Maybe<Item> item)
         {
             Value = value;
-            CombatValue = combatValue;
             SelectionIndex = selectionIndex;
+            Item = item;
         }
 
         public char Value { get; }
-
-        public int CombatValue { get; }
 
         public Maybe<int> SelectionIndex { get; }
 
         public bool IsSelected => SelectionIndex.HasValue;
 
+        public Maybe<Item> Item { get; }
+
         public CharCell Select(int index)
         {
-            return new CharCell(Value, CombatValue, Maybe.Some<int>(index));
+            return new CharCell(Value, Maybe.Some<int>(index), Item);
         }
 
         public CharCell Deselect()
         {
-            return new CharCell(Value, CombatValue, Maybe.None<int>());
+            return new CharCell(Value, Maybe.None<int>(), Item);
+        }
+
+        public CharCell WithLoot(Random random, Encounter value)
+        {
+            var item = Logic.Item.CreateLoot(random, value.ActiveEnemy.Select(a => a.Tier).ValueOr(() => 1));
+            return new CharCell(
+                Value,
+                SelectionIndex,
+                Item
+                );
         }
     }
 }

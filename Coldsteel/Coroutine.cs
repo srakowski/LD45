@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections;
 
 namespace Coldsteel
@@ -43,6 +44,11 @@ namespace Coldsteel
             }
 
             _wait = _routine.Current is Wait w ? w : Wait.None();
+        }
+
+        public void Abort()
+        {
+            IsFinished = true;
         }
     }
 }
