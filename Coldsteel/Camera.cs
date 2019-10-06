@@ -8,16 +8,16 @@ namespace Coldsteel
 {
     public class Camera : Component
     {
-        public bool Enabled;
+        public bool Enabled = true;
 
         public Vector2 ToWorldCoords(Vector2 coords) =>
             Vector2.Transform(coords, Matrix.Invert(TransformationMatrix));
 
         internal Matrix TransformationMatrix =>
             Matrix.Identity *
-            Matrix.CreateRotationZ(Entity.Rotation) *
-            Matrix.CreateScale(Entity.Scale) *
-            Matrix.CreateTranslation(-Entity.Position.X, -Entity.Position.Y, 0f) *
+            Matrix.CreateRotationZ(Entity.GlobalRotation) *
+            Matrix.CreateScale(Entity.GlobalScale) *
+            Matrix.CreateTranslation(-Entity.GlobalPosition.X, -Entity.GlobalPosition.Y, 0f) *
             Matrix.CreateTranslation(
                 (Engine.Game.GraphicsDevice.Viewport.Width * 0.5f),
                 (Engine.Game.GraphicsDevice.Viewport.Height * 0.5f),

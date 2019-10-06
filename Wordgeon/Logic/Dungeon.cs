@@ -189,15 +189,18 @@ namespace Wordgeon.Logic
                     var cell = cells[pos];
                     // this will work, its okay
                     cell = cell.LayTile(new LetterTile(c)).Value;
+                    cells[pos] = cell;
 
-                    if (c == 'g')
+                    if (c == 'h')
                     {
-                        var (r, t) = lb.PullTiles(50);
+                        var pos2 = new Point(col, mid - 1);
+                        var cell2 = cells[pos2];
+                        var (r, t) = lb.PullTiles(20);
                         lb = r;
-                        cell = cell.SetOccupant(new LetterChest(t));
+                        cell2 = cell2.SetOccupant(new LetterChest(t));
+                        cells[pos2] = cell2;
                     }
 
-                    cells[pos] = cell;
                     col++;
                 }
             }
@@ -211,7 +214,33 @@ namespace Wordgeon.Logic
                 cells[pos] = cell;
             }
 
-            return new DungeonLevel(level, cells);
+            var d = new DungeonLevel(level, cells);
+
+
+            for (int i = 0; i < 2; i++)
+            {
+                var rcell = cells.Values.Where(n => !n.Occupant.HasValue)
+                    .Where(n => n.Position.X < 4 || n.Position.X > (Constants.LevelDim - 4) || n.Position.Y < 4 || n.Position.Y > (Constants.LevelDim - 4))
+                    .OrderBy(n => random.Next()).First();
+
+                var (r, t) = lb.PullTiles(random.Next(10, 20));
+                lb = r;
+                rcell = rcell.SetOccupant(new LetterChest(t));
+                d = d.SetCell(rcell);
+            }
+
+            for (int i = 0; i < 20; i++)
+            {
+                var rcell = cells.Values
+                    .Where(n => !n.Occupant.HasValue)
+                    .Where(n => n.Position.X < 4 || n.Position.X > (Constants.LevelDim - 4) || n.Position.Y < 4 || n.Position.Y > (Constants.LevelDim - 4))
+                    .OrderBy(n => random.Next()).First();
+                rcell = rcell.SetOccupant(new Rocks());
+                d = d.SetCell(rcell);
+            }
+
+
+            return d;
         }
 
         internal Maybe<DungeonCell> GetCell(Point dungeonPos)
@@ -363,5 +392,6 @@ namespace Wordgeon.Logic
         {
             return new DungeonCell(Position, occupant, LetterTile);
         }
+
     }
 }

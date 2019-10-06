@@ -26,25 +26,21 @@ namespace Wordgeon
 
                 new ButtonControl(PlayerUp)
                     .AddBinding(
-                        new KeyboardButtonControlBinding(Keys.W),
                         new KeyboardButtonControlBinding(Keys.Up)
                         ),
 
                 new ButtonControl(PlayerDown)
                     .AddBinding(
-                        new KeyboardButtonControlBinding(Keys.S),
                         new KeyboardButtonControlBinding(Keys.Down)
                         ),
 
                 new ButtonControl(PlayerLeft)
                     .AddBinding(
-                        new KeyboardButtonControlBinding(Keys.A),
                         new KeyboardButtonControlBinding(Keys.Left)
                         ),
 
                 new ButtonControl(PlayerRight)
                     .AddBinding(
-                        new KeyboardButtonControlBinding(Keys.D),
                         new KeyboardButtonControlBinding(Keys.Right)
                         ),
 

@@ -37,33 +37,37 @@ namespace Wordgeon.Logic
             if (!maybeCell.HasValue) return Maybe.None<GameState>();
 
             var c = maybeCell.Value;
-            if (!c.LetterTile.HasValue) return Maybe.None<GameState>();
 
-            if (c.Occupant.HasValue)
+            if (!c.LetterTile.HasValue && !c.Occupant.HasValue)
             {
-                var occupant = c.Occupant.Value;
-                if (occupant is DownStairs)
-                {
-                    var d = Dungeon.Descend();
-                    if (!d.HasValue) return Maybe.None<GameState>();
-                    return new GameState(
-                        d.Value,
-                        Player.SetPosition(c.Position),
-                        TilePlacer
-                        );
-                }
-                else if (occupant is UpStairs)
-                {
-                    var d = Dungeon.Ascend();
-                    if (!d.HasValue) return Maybe.None<GameState>();
-                    return new GameState(
-                        d.Value,
-                        Player.SetPosition(c.Position),
-                        TilePlacer
-                        );
-                }
+
+                return Maybe.None<GameState>();
             }
 
+            //if (c.Occupant.HasValue)
+            //{
+            //    var occupant = c.Occupant.Value;
+            //    if (occupant is DownStairs)
+            //    {
+            //        var d = Dungeon.Descend();
+            //        if (!d.HasValue) return Maybe.None<GameState>();
+            //        return new GameState(
+            //            d.Value,
+            //            Player.SetPosition(c.Position),
+            //            TilePlacer
+            //            );
+            //    }
+            //    else if (occupant is UpStairs)
+            //    {
+            //        var d = Dungeon.Ascend();
+            //        if (!d.HasValue) return Maybe.None<GameState>();
+            //        return new GameState(
+            //            d.Value,
+            //            Player.SetPosition(c.Position),
+            //            TilePlacer
+            //            );
+            //    }
+            //}
 
             //if (maybeCell.HasValue && !maybeCell.Value.LetterTile.HasValue)
             //{
@@ -87,6 +91,37 @@ namespace Wordgeon.Logic
                         TilePlacer
                     ))
                 );
+        }
+
+        internal Maybe<GameState> TakeStairs()
+        {
+            var pcell = Dungeon.GetCell(Player.LevelPosition);
+            if (pcell.Value.Occupant.HasValue)
+            {
+                var occupant = pcell.Value.Occupant.Value;
+                //if (occupant is UpStairs)
+                //{
+                //    var d = Dungeon.Ascend();
+                //    if (!d.HasValue) return Maybe.None<GameState>();
+                //    return new GameState(
+                //        d.Value,
+                //        Player,
+                //        TilePlacer
+                //        );
+                //}
+                //else 
+                if (occupant is DownStairs)
+                {
+                    var d = Dungeon.Descend();
+                    if (!d.HasValue) return Maybe.None<GameState>();
+                    return new GameState(
+                        d.Value,
+                        Player,
+                        TilePlacer
+                        );
+                }
+            }
+            return Maybe.None<GameState>();
         }
 
         internal Maybe<GameState> StartTilePlacer()
@@ -230,6 +265,11 @@ namespace Wordgeon.Logic
 
             if (!maybeCell.HasValue) return Maybe.None<GameState>();
             var cell = maybeCell.Value;
+
+            if (cell.Occupant.HasValue)
+            {
+                return Maybe.None<GameState>();
+            }
 
             if (cell.LetterTile.HasValue)
             {

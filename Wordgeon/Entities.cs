@@ -11,6 +11,9 @@ namespace Wordgeon
         public WordgeonEntity(Gameplay gameplay)
         {
             Gameplay = gameplay;
+            var m = (Constants.TileDim * Constants.LevelDim) / 2;
+            Position = new Vector2(m, m);
+            AddComponent(new Camera());
         }
 
         public Gameplay Gameplay { get; }
@@ -40,7 +43,6 @@ namespace Wordgeon
     public class DungeonCellDisplay : WordgeonEntity
     {
         private readonly Point dungeonPos;
-        private readonly TextSprite letterSprite;
 
         public DungeonCellDisplay(Gameplay gameplay, Point dungeonPos) : base(gameplay)
         {
@@ -55,8 +57,11 @@ namespace Wordgeon
                 return;
             }
 
-            ChestSprite = new Sprite("letterchest", SpriteLayers.OccupantTiles) { Enabled = false };
-            AddComponent(ChestSprite);
+            Rocks = new Sprite("rocks", SpriteLayers.OccupantTiles) { Enabled = false };
+            AddComponent(Rocks);
+
+            LetterCrystals = new Sprite("crystals", SpriteLayers.OccupantTiles) { Enabled = false };
+            AddComponent(LetterCrystals);
 
             StairsSprite = new Sprite("stairs", SpriteLayers.OccupantTiles) { Enabled = false };
             AddComponent(StairsSprite);
@@ -64,18 +69,17 @@ namespace Wordgeon
             BTOYendorSprite = new Sprite("btoy", SpriteLayers.OccupantTiles) { Enabled = false };
             AddComponent(BTOYendorSprite);
 
-            letterSprite = new TextSprite("Font", "", SpriteLayers.LetterTiles)
-            {
-                Enabled = false,
-                Color = Color.Black,
-            };
-            AddComponent(letterSprite);
+            LetterSprite = new Sprite("lettertiles", SpriteLayers.OccupantTiles) { Enabled = false };
+            AddComponent(LetterSprite);
+
             AddComponent(new RelayBehavior(UpdateTile));
         }
 
         public Sprite Sprite { get; }
+        public Sprite LetterSprite { get; }
 
-        public Sprite ChestSprite { get; }
+        public Sprite Rocks { get; }
+        public Sprite LetterCrystals { get; }
         public Sprite StairsSprite { get; }
         public Sprite BTOYendorSprite { get; }
 
@@ -87,14 +91,20 @@ namespace Wordgeon
                 return;
             }
 
-            letterSprite.Enabled = tile.Bind(v => v.LetterTile).HasValue;
-            if (tile.HasValue && tile.Value.LetterTile.HasValue)
+            LetterSprite.Enabled = tile.Bind(v => v.LetterTile).HasValue;
+            if (tile.HasValue && tile.Value.LetterTile.HasValue && LetterSprite.Enabled)
             {
-                letterSprite.Text = tile.Value.LetterTile.Value.Value.ToString().ToUpper();
+                var c = char.ToUpper(tile.Value.LetterTile.Value.Value);
+                var i = c - 'A';
+                var r = i / 8;
+                var cl = i % 8;
+                var pt = (new Point(cl, r).ToVector2() * Constants.TileDim);
+                LetterSprite.SourceRectangle = new Rectangle(pt.ToPoint(), new Point(Constants.TileDim, Constants.TileDim));
             }
 
             var occupant = tile.Bind(v => v.Occupant).ValueOr(() => null);
-            ChestSprite.Enabled = occupant is LetterChest;
+            Rocks.Enabled = occupant is Rocks;
+            LetterCrystals.Enabled = occupant is LetterChest;
             StairsSprite.Enabled = occupant is UpStairs || occupant is DownStairs;
             BTOYendorSprite.Enabled = occupant is BlankTileOfYendor;
 
@@ -137,7 +147,7 @@ namespace Wordgeon
 
         public Hud(Gameplay gameplay) : base(gameplay)
         {
-            Position = new Vector2(1000, 800);
+            Position = new Vector2(1000, 100);
             lettersSprite = new TextSprite("Font", "", SpriteLayers.Player);
             AddComponent(lettersSprite);
             AddComponent(new RelayBehavior(Update));
@@ -146,7 +156,14 @@ namespace Wordgeon
 
         private void Update()
         {
-            lettersSprite.Text = new string(Gameplay.Player.LetterInventory.Select(l => l.Value).ToArray());
+            var chars = Gameplay.Player.LetterInventory.Select(l => l.Value).ToArray();
+            var values = chars.OrderBy(c => c)
+                .GroupBy(c => c)
+                .Select(c => new { Char = c.Key, Count = c.Count() })
+                .Select(c => $"{char.ToUpper(c.Char)} x {c.Count}");
+
+            lettersSprite.Text = string.Join("\n", values);
+
         }
     }
 

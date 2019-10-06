@@ -56,6 +56,10 @@ namespace Wordgeon
                 {
                     gameplay.StartTilePlacer();
                 }
+                else if (changeTileDir.WasPushed())
+                {
+                    gameplay.AscendIfOnStair();
+                }
 
                 if (gameplay.TilePlacer.HasValue)
                 {

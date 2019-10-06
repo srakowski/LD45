@@ -59,5 +59,7 @@ namespace Wordgeon
         internal bool WordEntryLetter(char c) => HandleUpdateResult(State.WordEntryLetter(c));
         internal bool CommitWordEntry() => HandleUpdateResult(State.CommitWordEntry());
         internal bool CancelWordEntry() => HandleUpdateResult(State.CancelWordEntry());
+
+        internal void AscendIfOnStair() => HandleUpdateResult(State.TakeStairs());
     }
 }

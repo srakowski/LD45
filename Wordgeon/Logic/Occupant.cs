@@ -32,6 +32,11 @@ namespace Wordgeon.Logic
         public Player InteractWithPlayer(Player player) => player;
     }
 
+    public class Rocks : IOccupant
+    {
+        public Player InteractWithPlayer(Player player) => player;
+    }
+
     public class BlankTileOfYendor : IOccupant
     {
         public Player InteractWithPlayer(Player player)

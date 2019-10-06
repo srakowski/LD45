@@ -35,17 +35,17 @@ namespace Wordgeon.Logic
 
         public Maybe<(Player, DungeonCell)> Action(DungeonCell cell)
         {
-            if (!cell.Occupant.HasValue && cell.LetterTile.HasValue)
+            if ((!cell.Occupant.HasValue && cell.LetterTile.HasValue) || (cell.Occupant.HasValue && (cell.Occupant.Value is UpStairs || cell.Occupant.Value is DownStairs)))
             {
                 return (new Player(cell.Position, LetterInventory, BlankTileOfYendor), cell);
             }
 
-            if  (cell.Occupant.HasValue)
+            if  (cell.Occupant.HasValue && cell.Occupant.Value is LetterChest || cell.Occupant.Value is BlankTileOfYendor)
             {
                 var occupant = cell.Occupant.Value;
                 var player = occupant.InteractWithPlayer(this);
 
-                cell = cell.SetOccupant(Maybe.None<IOccupant>());
+                cell = cell.SetOccupant(new Rocks());
 
                 return (player, cell);
             }
