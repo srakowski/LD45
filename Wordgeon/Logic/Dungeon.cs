@@ -23,7 +23,57 @@ namespace Wordgeon.Logic
                 .Select(l => DungeonLevel.New(l, random))
                 .ToArray();
 
+            levels = PlaceStairs(levels, random);
+
             return new Dungeon(levels.First(), levels);
+        }
+
+        private static DungeonLevel[] PlaceStairs(DungeonLevel[] levels, Random random)
+        {
+            List<DungeonLevel> newLevels = new List<DungeonLevel>();
+            var upStairsForNext = Maybe.None<Point>();
+            foreach (var level in levels)
+            {
+                var lwus = level;
+                if (upStairsForNext.HasValue)
+                {
+                    var setStairsAt = upStairsForNext.Value;
+                    var mcell = lwus.GetCell(setStairsAt);
+                    if (!mcell.HasValue) break;
+                    var cws = mcell.Value.SetOccupant(new UpStairs());
+                    lwus = lwus.SetCell(cws);
+                }
+
+                var nextLevel = levels.FirstOrDefault(l => l.Level == level.Level + 1).ToMaybe();
+                if (!nextLevel.HasValue)
+                {
+                    newLevels.Add(lwus);
+                    break;
+                }
+
+                var nl = nextLevel.Value;
+
+                var nonOccupiedGoodCells = lwus.Cells
+                .Where(c => !c.Occupant.HasValue && !c.LetterTile.HasValue)
+                .Where(c => c.Position.X != 0 && c.Position.X != Constants.LevelDim - 1)
+                .Where(c => c.Position.Y != 0 && c.Position.Y != Constants.LevelDim - 1);
+
+
+                var stairCell = nonOccupiedGoodCells
+                    .OrderBy(_ => random.Next())
+                    .First(l =>
+                    {
+                        var belowCell = nl.Cells.First(c => c.Position == l.Position);
+                        return !belowCell.Occupant.HasValue && !belowCell.LetterTile.HasValue;
+                    });
+
+                upStairsForNext = stairCell.Position;
+
+                var sc = stairCell.SetOccupant(new DownStairs());
+                var lws = lwus.SetCell(sc);
+                newLevels.Add(lws);
+            }
+            return newLevels.ToArray();
         }
 
         public Maybe<DungeonCell> GetCell(Point dungeonPos) => ActiveLevel.GetCell(dungeonPos);
@@ -55,6 +105,22 @@ namespace Wordgeon.Logic
                 );
         }
 
+        internal Maybe<Dungeon> Ascend()
+        {
+            var d = SaveActiveLevel();
+            var up = d.levels.FirstOrDefault(l => l.Level == ActiveLevel.Level - 1).ToMaybe();
+            if (!up.HasValue) return Maybe.None<Dungeon>();
+            return new Dungeon(up.Value, d.levels);
+        }
+
+        internal Maybe<Dungeon> Descend()
+        {
+            var d = SaveActiveLevel();
+            var down = d.levels.FirstOrDefault(l => l.Level == ActiveLevel.Level + 1).ToMaybe();
+            if (!down.HasValue) return Maybe.None<Dungeon>();
+            return new Dungeon(down.Value, d.levels);
+        }
+
         internal Maybe<Dungeon> RemoveLetterTile(Point levelPosition)
         {
             var level = ActiveLevel.RemoveTile(levelPosition);
@@ -64,6 +130,13 @@ namespace Wordgeon.Logic
                 level.Value,
                 levels
                 );
+        }
+
+        public Dungeon ReplaceCell(DungeonCell cell)
+        {
+            return new Dungeon(
+                ActiveLevel.SetCell(cell),
+                levels);
         }
 
         internal bool AllLetterTilesAreAdjacent() => ActiveLevel.AllLetterTilesAreAdjacent();
@@ -79,13 +152,17 @@ namespace Wordgeon.Logic
             int level,
             Dictionary<Point, DungeonCell> cells)
         {
+            this.Level = level;
             this.cells = cells;
         }
 
         public int Level { get; }
+        public IEnumerable<DungeonCell> Cells => cells.Values;
 
         public static DungeonLevel New(int level, Random random)
         {
+            var lb = LetterBag.New(random);
+
             var cells = Enumerable.Range(0, Constants.LevelDim)
                 .SelectMany(row => Enumerable
                     .Range(0, Constants.LevelDim)
@@ -111,6 +188,14 @@ namespace Wordgeon.Logic
                     var cell = cells[pos];
                     // this will work, its okay
                     cell = cell.LayTile(new LetterTile(c)).Value;
+
+                    if (c == 'g')
+                    {
+                        var (r, t) = lb.PullTiles(50);
+                        lb = r;
+                        cell = cell.SetOccupant(new LetterChest(t));
+                    }
+
                     cells[pos] = cell;
                     col++;
                 }
@@ -215,6 +300,17 @@ namespace Wordgeon.Logic
 
             return colWords.Concat(rowWords);
         }
+
+        internal DungeonLevel SetCell(DungeonCell cell)
+        {
+            return new DungeonLevel(
+                Level,
+                cells.ToDictionary(
+                    k => k.Key,
+                    v => v.Value.Position == cell.Position ? cell : v.Value
+                )
+            );
+        }
     }
 
     public class DungeonCell
@@ -251,6 +347,11 @@ namespace Wordgeon.Logic
         {
             if (!LetterTile.HasValue) return this;
             return new DungeonCell(Position, Occupant, Maybe.None<LetterTile>());
+        }
+
+        internal DungeonCell SetOccupant(Maybe<IOccupant> occupant)
+        {
+            return new DungeonCell(Position, occupant, LetterTile);
         }
     }
 }

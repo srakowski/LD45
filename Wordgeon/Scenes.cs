@@ -22,6 +22,8 @@ namespace Wordgeon
             scene.AddAsset(new Asset<Texture2D>("tile"));
             scene.AddAsset(new Asset<Texture2D>("player"));
             scene.AddAsset(new Asset<Texture2D>("tile_placer"));
+            scene.AddAsset(new Asset<Texture2D>("letterchest"));
+            scene.AddAsset(new Asset<Texture2D>("stairs"));
             scene.AddAsset(new Asset<SpriteFont>("Font"));
 
             SpriteLayers.Setup(scene);

@@ -9,41 +9,44 @@ namespace Wordgeon.Logic
     {
         private Player(
             Point levelPos,
-            IEnumerable<LetterTile> letterInventory,
-            LetterBag letterBag
+            IEnumerable<LetterTile> letterInventory
             )
         {
             LevelPosition = levelPos;
             LetterInventory = letterInventory;
-            LetterBag = letterBag;
         }
 
         public Point LevelPosition { get; }
 
         public IEnumerable<LetterTile> LetterInventory { get; }
 
-        public LetterBag LetterBag { get; }
-
-        public static Player New(Random random)
+        public static Player New()
         {
-            var letterbag = LetterBag.New(random);
-            var (lb, tiles) = letterbag.PullTiles(7);
             var lvlCenter = Constants.LevelDim / 2;
             return new Player(
                 new Point(lvlCenter, lvlCenter),
-                tiles,
-                lb
+                Enumerable.Empty<LetterTile>()
                 );
         }
 
-        public Maybe<Player> Action(DungeonCell cell)
+        public Maybe<(Player, DungeonCell)> Action(DungeonCell cell)
         {
             if (!cell.Occupant.HasValue && cell.LetterTile.HasValue)
             {
-                return new Player(cell.Position, LetterInventory, LetterBag);
+                return (new Player(cell.Position, LetterInventory), cell);
             }
 
-            return Maybe.None<Player>();
+            if  (cell.Occupant.HasValue)
+            {
+                var occupant = cell.Occupant.Value;
+                var player = occupant.InteractWithPlayer(this);
+
+                cell = cell.SetOccupant(Maybe.None<IOccupant>());
+
+                return (player, cell);
+            }
+
+            return Maybe.None<(Player, DungeonCell)>();
         }
 
         public Maybe<Player> RemoveLetter(char letter)
@@ -52,8 +55,7 @@ namespace Wordgeon.Logic
             var letterTile = LetterInventory.First(l => l.Value == letter);
             return new Player(
                 LevelPosition,
-                LetterInventory.Where(l => l != letterTile).ToArray(),
-                LetterBag
+                LetterInventory.Where(l => l != letterTile).ToArray()
                 );
         }
 
@@ -61,9 +63,13 @@ namespace Wordgeon.Logic
         {
             return new Player(
                 LevelPosition,
-                LetterInventory.Concat(enumerable).ToArray(),
-                LetterBag
+                LetterInventory.Concat(enumerable).ToArray()
                 );
+        }
+
+        internal Player SetPosition(Point position)
+        {
+            return new Player(position, LetterInventory);
         }
     }
 }

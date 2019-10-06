@@ -2,6 +2,7 @@
 using System.Linq;
 using Coldsteel;
 using Microsoft.Xna.Framework;
+using Wordgeon.Logic;
 
 namespace Wordgeon
 {
@@ -47,6 +48,19 @@ namespace Wordgeon
             Position = dungeonPos.ToVector2() * (float)Constants.TileDim;
             Sprite = new Sprite("tile", SpriteLayers.Default);
             AddComponent(Sprite);
+
+            var tile = Gameplay.GetDungeonCell(dungeonPos);
+            if (!tile.HasValue)
+            {
+                return;
+            }
+
+            ChestSprite = new Sprite("letterchest", SpriteLayers.OccupantTiles) { Enabled = false };
+            AddComponent(ChestSprite);
+
+            StairsSprite = new Sprite("stairs", SpriteLayers.OccupantTiles) { Enabled = false };
+            AddComponent(StairsSprite);
+
             letterSprite = new TextSprite("Font", "", SpriteLayers.LetterTiles)
             {
                 Enabled = false,
@@ -57,6 +71,9 @@ namespace Wordgeon
         }
 
         public Sprite Sprite { get; }
+
+        public Sprite ChestSprite { get; }
+        public Sprite StairsSprite { get; }
 
         private void UpdateTile()
         {
@@ -71,6 +88,11 @@ namespace Wordgeon
             {
                 letterSprite.Text = tile.Value.LetterTile.Value.Value.ToString().ToUpper();
             }
+
+            var occupant = tile.Bind(v => v.Occupant).ValueOr(() => null);
+            ChestSprite.Enabled = occupant is LetterChest;
+            StairsSprite.Enabled = occupant is UpStairs || occupant is DownStairs;
+
 
             Sprite.Color = Color.White;
             if (Gameplay.TilePlacer.HasValue)

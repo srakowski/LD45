@@ -26,7 +26,7 @@ namespace Wordgeon.Logic
         public static GameState New(Random random)
         {
             var dungeon = Dungeon.New(random);
-            var player = Logic.Player.New(random);
+            var player = Logic.Player.New();
             return new GameState(dungeon, player, Maybe.None<TilePlacer>());
         }
 
@@ -34,6 +34,36 @@ namespace Wordgeon.Logic
         {
             var actionTo = Player.LevelPosition + new Point(colDelta, rowDelta);
             var maybeCell = Dungeon.GetCell(actionTo);
+            if (!maybeCell.HasValue) return Maybe.None<GameState>();
+
+            var c = maybeCell.Value;
+            if (!c.LetterTile.HasValue) return Maybe.None<GameState>();
+
+            if (c.Occupant.HasValue)
+            {
+                var occupant = c.Occupant.Value;
+                if (occupant is DownStairs)
+                {
+                    var d = Dungeon.Descend();
+                    if (!d.HasValue) return Maybe.None<GameState>();
+                    return new GameState(
+                        d.Value,
+                        Player.SetPosition(c.Position),
+                        TilePlacer
+                        );
+                }
+                else if (occupant is UpStairs)
+                {
+                    var d = Dungeon.Ascend();
+                    if (!d.HasValue) return Maybe.None<GameState>();
+                    return new GameState(
+                        d.Value,
+                        Player.SetPosition(c.Position),
+                        TilePlacer
+                        );
+                }
+            }
+
 
             //if (maybeCell.HasValue && !maybeCell.Value.LetterTile.HasValue)
             //{
@@ -51,9 +81,9 @@ namespace Wordgeon.Logic
             return maybeCell.Bind(cell =>
                 Player
                     .Action(cell)
-                    .Select(player => new GameState(
-                        Dungeon,
-                        player,
+                    .Select(playerAndCell => new GameState(
+                        Dungeon.ReplaceCell(playerAndCell.Item2),
+                        playerAndCell.Item1,
                         TilePlacer
                     ))
                 );
