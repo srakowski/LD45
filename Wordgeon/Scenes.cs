@@ -30,6 +30,7 @@ namespace Wordgeon
             scene.AddEntity(new PlayerEntity(gameplay));
             scene.AddEntity(new GameplayControllerEntity(gameplay));
             scene.AddEntity(new TilePlacerEntity(gameplay));
+            scene.AddEntity(new Hud(gameplay));
 
             return scene;
         }

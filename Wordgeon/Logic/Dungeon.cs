@@ -67,6 +67,8 @@ namespace Wordgeon.Logic
         }
 
         internal bool AllLetterTilesAreAdjacent() => ActiveLevel.AllLetterTilesAreAdjacent();
+
+        internal IEnumerable<string> CollectAllWords() => ActiveLevel.CollectAllWords();
     }
 
     public class DungeonLevel
@@ -183,6 +185,35 @@ namespace Wordgeon.Logic
             CheckAdjacency(cell.Value, new Point(0, 1), allLetterCells);
             CheckAdjacency(cell.Value, new Point(-1, 0), allLetterCells);
             CheckAdjacency(cell.Value, new Point(1, 0), allLetterCells);
+        }
+
+        public IEnumerable<string> CollectAllWords()
+        {
+            var colWords = Enumerable
+                .Range(0, Constants.LevelDim)
+                .SelectMany(c => new string(
+                    Enumerable.Range(0, Constants.LevelDim)
+                        .Select(r => cells[new Point(c, r)])
+                        .Select(cell => cell.LetterTile.Select(lt => lt.Value).ValueOr(() => ' '))
+                        .ToArray()
+                    ).Split()
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Where(s => s.Length > 1)
+                );
+
+            var rowWords = Enumerable
+                .Range(0, Constants.LevelDim)
+                .SelectMany(r => new string(
+                    Enumerable.Range(0, Constants.LevelDim)
+                        .Select(c => cells[new Point(c, r)])
+                        .Select(cell => cell.LetterTile.Select(lt => lt.Value).ValueOr(() => ' '))
+                        .ToArray()
+                    ).Split()
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .Where(s => s.Length > 1)
+                );
+
+            return colWords.Concat(rowWords);
         }
     }
 

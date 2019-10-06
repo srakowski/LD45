@@ -55,15 +55,13 @@ namespace Wordgeon
 
                 new ButtonControl(CastTileSpell)
                     .AddBinding(
-                        new KeyboardButtonControlBinding(Keys.E),
-                        new KeyboardButtonControlBinding(Keys.Q)
+                        new KeyboardButtonControlBinding(Keys.Enter)
                         ),
 
 
                 new ButtonControl(ChangePlacementDirection)
                     .AddBinding(
-                        new KeyboardButtonControlBinding(Keys.E),
-                        new KeyboardButtonControlBinding(Keys.Q)
+                        new KeyboardButtonControlBinding(Keys.Space)
                         ),
 
                 new ButtonControl(StartWordEntry)

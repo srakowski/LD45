@@ -26,7 +26,7 @@ namespace Wordgeon.Logic
         public static GameState New(Random random)
         {
             var dungeon = Dungeon.New(random);
-            var player = Logic.Player.New();
+            var player = Logic.Player.New(random);
             return new GameState(dungeon, player, Maybe.None<TilePlacer>());
         }
 
@@ -158,6 +158,10 @@ namespace Wordgeon.Logic
             var tp = TilePlacer.Value;
 
             if (!Dungeon.AllLetterTilesAreAdjacent())
+                return Maybe.None<GameState>();
+
+            var allWords = Dungeon.CollectAllWords();
+            if (!allWords.All(GameDictionary.HasWord))
                 return Maybe.None<GameState>();
 
             return new GameState(

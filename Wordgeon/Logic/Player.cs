@@ -9,23 +9,30 @@ namespace Wordgeon.Logic
     {
         private Player(
             Point levelPos,
-            IEnumerable<LetterTile> letterInventory
+            IEnumerable<LetterTile> letterInventory,
+            LetterBag letterBag
             )
         {
             LevelPosition = levelPos;
             LetterInventory = letterInventory;
+            LetterBag = letterBag;
         }
 
         public Point LevelPosition { get; }
 
         public IEnumerable<LetterTile> LetterInventory { get; }
 
-        public static Player New()
+        public LetterBag LetterBag { get; }
+
+        public static Player New(Random random)
         {
+            var letterbag = LetterBag.New(random);
+            var (lb, tiles) = letterbag.PullTiles(7);
             var lvlCenter = Constants.LevelDim / 2;
             return new Player(
                 new Point(lvlCenter, lvlCenter),
-                new char[] {'a', 'b', 'c', 'd'}.Select(c => new LetterTile(c)).ToArray()
+                tiles,
+                lb
                 );
         }
 
@@ -33,7 +40,7 @@ namespace Wordgeon.Logic
         {
             if (!cell.Occupant.HasValue && cell.LetterTile.HasValue)
             {
-                return new Player(cell.Position, LetterInventory);
+                return new Player(cell.Position, LetterInventory, LetterBag);
             }
 
             return Maybe.None<Player>();
@@ -45,7 +52,8 @@ namespace Wordgeon.Logic
             var letterTile = LetterInventory.First(l => l.Value == letter);
             return new Player(
                 LevelPosition,
-                LetterInventory.Where(l => l != letterTile).ToArray()
+                LetterInventory.Where(l => l != letterTile).ToArray(),
+                LetterBag
                 );
         }
 
@@ -53,7 +61,8 @@ namespace Wordgeon.Logic
         {
             return new Player(
                 LevelPosition,
-                LetterInventory.Concat(enumerable).ToArray()
+                LetterInventory.Concat(enumerable).ToArray(),
+                LetterBag
                 );
         }
     }

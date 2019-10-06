@@ -7,6 +7,7 @@ namespace Wordgeon
         [STAThread]
         static void Main()
         {
+            GameDictionary.Load();
             using (var game = new WordgeonGame())
                 game.Run();
         }

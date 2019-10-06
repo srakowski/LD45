@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Coldsteel;
 using Microsoft.Xna.Framework;
 
@@ -101,6 +102,25 @@ namespace Wordgeon
         {
             Sprite.Enabled = !Gameplay.TilePlacer.HasValue;
             Position = Gameplay.Player.LevelPosition.ToVector2() * Constants.TileDim;
+        }
+    }
+
+    public class Hud : WordgeonEntity
+    {
+        private readonly TextSprite lettersSprite;
+
+        public Hud(Gameplay gameplay) : base(gameplay)
+        {
+            Position = new Vector2(1000, 800);
+            lettersSprite = new TextSprite("Font", "", SpriteLayers.Player);
+            AddComponent(lettersSprite);
+            AddComponent(new RelayBehavior(Update));
+            Update();
+        }
+
+        private void Update()
+        {
+            lettersSprite.Text = new string(Gameplay.Player.LetterInventory.Select(l => l.Value).ToArray());
         }
     }
 
