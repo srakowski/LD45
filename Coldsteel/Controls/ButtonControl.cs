@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework;
+using System;
 using System.Linq;
 
 namespace Coldsteel.Controls
@@ -30,5 +31,8 @@ namespace Coldsteel.Controls
 
         public bool WasReleased(PlayerIndex playerIndex = PlayerIndex.One) =>
             _bindingsByPlayer[(int)playerIndex].Any(b => b.WasReleased());
+
+        public ButtonControlBinding GetBindingPushed(PlayerIndex playerIndex = PlayerIndex.One) =>
+            _bindingsByPlayer[(int)playerIndex].FirstOrDefault(b => b.WasPushed());
     }
 }

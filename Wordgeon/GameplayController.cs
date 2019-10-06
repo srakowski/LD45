@@ -9,7 +9,7 @@ namespace Wordgeon
     internal class GameplayController : Behavior
     {
         private readonly Gameplay gameplay;
-        private ButtonControl up, down, left, right, changeTileDir, cancel, startWord, castTileSpell;
+        private ButtonControl up, down, left, right, changeTileDir, cancel, startWord, castTileSpell, anyLetter;
         private TextInputControl textInputControl;
 
 
@@ -28,6 +28,7 @@ namespace Wordgeon
             changeTileDir = GetControl<ButtonControl>(Controls.ChangePlacementDirection);
             startWord = GetControl<ButtonControl>(Controls.StartWordEntry);
             castTileSpell = GetControl<ButtonControl>(Controls.CastTileSpell);
+            anyLetter = GetControl<ButtonControl>(Controls.AnyLetter);
             textInputControl = GetControl<TextInputControl>(Controls.TextInput);
             StartCoroutine(RunPlayerInteraction());
         }
@@ -116,6 +117,14 @@ namespace Wordgeon
                 else if (startWord.WasPushed())
                 {
                     gameplay.StartWordEntry();
+                    StartCoroutine(RunWordEntry());
+                    break;
+                }
+                else if (anyLetter.WasPushed())
+                {
+                    var key = char.ToLower((anyLetter.GetBindingPushed() as KeyboardButtonControlBinding).Key.ToString().First());
+                    gameplay.StartWordEntry();
+                    gameplay.WordEntryLetter(key);
                     StartCoroutine(RunWordEntry());
                     break;
                 }

@@ -14,7 +14,10 @@ namespace Wordgeon
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = 1080;
-            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferWidth = 1440;
+            graphics.ApplyChanges();
+
+            Window.AllowUserResizing = true;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -28,7 +31,7 @@ namespace Wordgeon
         {
             base.Initialize();
             gameplay = Gameplay.NewGame();
-            engine.LoadScene(nameof(SceneFactory.GameplayScene), gameplay);
+            engine.LoadScene(nameof(SceneFactory.GameStartScene), gameplay);
         }
     }
 }

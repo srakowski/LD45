@@ -30,6 +30,8 @@ namespace Coldsteel
 
         public Matrix? TransformMatrix;
 
+        private RenderTarget2D _rt;
+
         public SpriteLayer() { }
 
         public SpriteLayer(string name)
@@ -37,7 +39,7 @@ namespace Coldsteel
             Name = name;
         }
 
-        internal void Draw(SpriteBatch spriteBatch, Camera camera, IEnumerable<ISprite> sprites)
+        internal void Draw(SpriteBatch spriteBatch, Camera camera, IEnumerable<ISprite> sprites, Matrix scaleMatrix)
         {
             var cameraMatrix = camera != null && !FixToCamera
                 ? camera.TransformationMatrix

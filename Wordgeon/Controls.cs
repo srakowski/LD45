@@ -16,6 +16,7 @@ namespace Wordgeon
         public const string CastTileSpell = "CastTileSpell";
         public const string ChangePlacementDirection = "Change Placement Direction";
         public const string StartWordEntry = "StartWordEntry";
+        public const string AnyLetter = "AnyLetter";
 
         public static IEnumerable<Control> Create()
         {
@@ -63,6 +64,36 @@ namespace Wordgeon
                 new ButtonControl(StartWordEntry)
                     .AddBinding(
                         new KeyboardButtonControlBinding(Keys.Enter)
+                        ),
+
+                new ButtonControl(AnyLetter)
+                    .AddBinding(
+                        new KeyboardButtonControlBinding(Keys.A),
+                        new KeyboardButtonControlBinding(Keys.B),
+                        new KeyboardButtonControlBinding(Keys.C),
+                        new KeyboardButtonControlBinding(Keys.D),
+                        new KeyboardButtonControlBinding(Keys.E),
+                        new KeyboardButtonControlBinding(Keys.F),
+                        new KeyboardButtonControlBinding(Keys.G),
+                        new KeyboardButtonControlBinding(Keys.H),
+                        new KeyboardButtonControlBinding(Keys.I),
+                        new KeyboardButtonControlBinding(Keys.J),
+                        new KeyboardButtonControlBinding(Keys.K),
+                        new KeyboardButtonControlBinding(Keys.L),
+                        new KeyboardButtonControlBinding(Keys.M),
+                        new KeyboardButtonControlBinding(Keys.N),
+                        new KeyboardButtonControlBinding(Keys.O),
+                        new KeyboardButtonControlBinding(Keys.P),
+                        new KeyboardButtonControlBinding(Keys.Q),
+                        new KeyboardButtonControlBinding(Keys.R),
+                        new KeyboardButtonControlBinding(Keys.S),
+                        new KeyboardButtonControlBinding(Keys.T),
+                        new KeyboardButtonControlBinding(Keys.U),
+                        new KeyboardButtonControlBinding(Keys.V),
+                        new KeyboardButtonControlBinding(Keys.W),
+                        new KeyboardButtonControlBinding(Keys.X),
+                        new KeyboardButtonControlBinding(Keys.Y),
+                        new KeyboardButtonControlBinding(Keys.Z)
                         ),
         };
     }

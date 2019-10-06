@@ -44,30 +44,31 @@ namespace Wordgeon.Logic
                 return Maybe.None<GameState>();
             }
 
-            //if (c.Occupant.HasValue)
-            //{
-            //    var occupant = c.Occupant.Value;
-            //    if (occupant is DownStairs)
-            //    {
-            //        var d = Dungeon.Descend();
-            //        if (!d.HasValue) return Maybe.None<GameState>();
-            //        return new GameState(
-            //            d.Value,
-            //            Player.SetPosition(c.Position),
-            //            TilePlacer
-            //            );
-            //    }
-            //    else if (occupant is UpStairs)
-            //    {
-            //        var d = Dungeon.Ascend();
-            //        if (!d.HasValue) return Maybe.None<GameState>();
-            //        return new GameState(
-            //            d.Value,
-            //            Player.SetPosition(c.Position),
-            //            TilePlacer
-            //            );
-            //    }
-            //}
+            if (c.Occupant.HasValue)
+            {
+                var occupant = c.Occupant.Value;
+                if (occupant is DownStairs)
+                {
+                    var d = Dungeon.Descend();
+                    if (!d.HasValue) return Maybe.None<GameState>();
+                    return new GameState(
+                        d.Value,
+                        Player.SetPosition(c.Position),
+                        TilePlacer
+                        );
+                }
+                //}
+                //else if (occupant is UpStairs)
+                //{
+                //    var d = Dungeon.Ascend();
+                //    if (!d.HasValue) return Maybe.None<GameState>();
+                //    return new GameState(
+                //        d.Value,
+                //        Player.SetPosition(c.Position),
+                //        TilePlacer
+                //        );
+                //}
+            }
 
             //if (maybeCell.HasValue && !maybeCell.Value.LetterTile.HasValue)
             //{

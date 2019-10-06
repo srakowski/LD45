@@ -19,6 +19,8 @@ namespace Coldsteel
 
         private SpriteBatch _spriteBatch;
 
+        private ViewportAdapter _vpa;
+
         public SpriteSystem(Game game, Engine engine) : base(game)
         {
             _engine = engine;
@@ -28,6 +30,7 @@ namespace Coldsteel
         public override void Initialize()
         {
             base.Initialize();
+            _vpa = new ViewportAdapter(Game.Window, Game.GraphicsDevice, 1440, 900);
             _spriteBatch = new SpriteBatch(Game.GraphicsDevice);
         }
 
@@ -81,7 +84,7 @@ namespace Coldsteel
             foreach (var spriteLayer in scene.SpriteLayers.OrderBy(s => s.Depth))
             {
                 var spritesThisLayer = sprites.Where(s => s.Enabled && s.SpriteLayerName == spriteLayer.Name);
-                spriteLayer.Draw(_spriteBatch, camera, spritesThisLayer);
+                spriteLayer.Draw(_spriteBatch, camera, spritesThisLayer, _vpa.GetScaleMatrix());
             }
         }
     }

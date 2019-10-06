@@ -219,7 +219,7 @@ namespace Wordgeon.Logic
             var d = new DungeonLevel(level, cells);
 
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 4; i++)
             {
                 var rcell = cells.Values.Where(n => !n.Occupant.HasValue)
                     .Where(n => n.Position.X < 4 || n.Position.X > (Constants.LevelDim - 4) || n.Position.Y < 4 || n.Position.Y > (Constants.LevelDim - 4))
@@ -231,7 +231,7 @@ namespace Wordgeon.Logic
                 d = d.SetCell(rcell);
             }
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 24; i++)
             {
                 var rcell = cells.Values
                     .Where(n => !n.Occupant.HasValue)

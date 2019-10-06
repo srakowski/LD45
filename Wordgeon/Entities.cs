@@ -66,7 +66,11 @@ namespace Wordgeon
             StairsSprite = new Sprite("stairs", SpriteLayers.OccupantTiles) { Enabled = false };
             AddComponent(StairsSprite);
 
-            BTOYendorSprite = new Sprite("btoy", SpriteLayers.OccupantTiles) { Enabled = false };
+            BTOYendorSprite = new Sprite("btoy", SpriteLayers.OccupantTiles)
+            {
+                Enabled = false,
+                Origin = new Vector2(32, 40),
+            };
             AddComponent(BTOYendorSprite);
 
             LetterSprite = new Sprite("lettertiles", SpriteLayers.OccupantTiles) { Enabled = false };
@@ -116,7 +120,7 @@ namespace Wordgeon
                 if ((tp.TilePlacementDir == Logic.TilePlacementDir.Row && t.Position.Y == tp.LevelPosition.Y && t.Position.X >= tp.LevelPosition.X) ||
                     (tp.TilePlacementDir == Logic.TilePlacementDir.Col && t.Position.X == tp.LevelPosition.X && t.Position.Y >= tp.LevelPosition.Y))
                 {
-                    Sprite.Color = Color.Green;
+                    Sprite.Color = Color.LightGray;
                 }
             }
         }
