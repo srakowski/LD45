@@ -17,6 +17,7 @@ namespace Wordgeon
         public const string ChangePlacementDirection = "Change Placement Direction";
         public const string StartWordEntry = "StartWordEntry";
         public const string AnyLetter = "AnyLetter";
+        public const string Restart = "Restart";
 
         public static IEnumerable<Control> Create()
         {
@@ -65,6 +66,9 @@ namespace Wordgeon
                     .AddBinding(
                         new KeyboardButtonControlBinding(Keys.Enter)
                         ),
+
+                new ButtonControl(Restart)
+                    .AddBinding(new KeyboardButtonControlBinding(Keys.F5)),
 
                 new ButtonControl(AnyLetter)
                     .AddBinding(

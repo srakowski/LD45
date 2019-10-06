@@ -219,6 +219,16 @@ namespace Wordgeon.Logic
             var d = new DungeonLevel(level, cells);
 
 
+            for (int i = 0; i < 24; i++)
+            {
+                var rcell = cells.Values
+                    .Where(n => !n.Occupant.HasValue)
+                    .Where(n => n.Position.X < 4 || n.Position.X > (Constants.LevelDim - 4) || n.Position.Y < 4 || n.Position.Y > (Constants.LevelDim - 4))
+                    .OrderBy(n => random.Next()).First();
+                rcell = rcell.SetOccupant(new Rocks());
+                d = d.SetCell(rcell);
+            }
+
             for (int i = 0; i < 4; i++)
             {
                 var rcell = cells.Values.Where(n => !n.Occupant.HasValue)
@@ -228,16 +238,6 @@ namespace Wordgeon.Logic
                 var (r, t) = lb.PullTiles(random.Next(10, 20));
                 lb = r;
                 rcell = rcell.SetOccupant(new LetterChest(t));
-                d = d.SetCell(rcell);
-            }
-
-            for (int i = 0; i < 24; i++)
-            {
-                var rcell = cells.Values
-                    .Where(n => !n.Occupant.HasValue)
-                    .Where(n => n.Position.X < 4 || n.Position.X > (Constants.LevelDim - 4) || n.Position.Y < 4 || n.Position.Y > (Constants.LevelDim - 4))
-                    .OrderBy(n => random.Next()).First();
-                rcell = rcell.SetOccupant(new Rocks());
                 d = d.SetCell(rcell);
             }
 

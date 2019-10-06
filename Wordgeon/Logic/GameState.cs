@@ -274,8 +274,8 @@ namespace Wordgeon.Logic
 
             if (cell.LetterTile.HasValue)
             {
-                if (cell.LetterTile.Value.Value != letter)
-                    return Maybe.None<GameState>();
+                //if (cell.LetterTile.Value.Value != letter)
+                //    return Maybe.None<GameState>();
 
                 tp = tp.AdvanceWord(Maybe.None<LetterTile>());
                 return new GameState(

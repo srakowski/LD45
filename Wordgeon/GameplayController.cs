@@ -9,7 +9,7 @@ namespace Wordgeon
     internal class GameplayController : Behavior
     {
         private readonly Gameplay gameplay;
-        private ButtonControl up, down, left, right, changeTileDir, cancel, startWord, castTileSpell, anyLetter;
+        private ButtonControl up, down, left, right, changeTileDir, cancel, startWord, castTileSpell, anyLetter, restart;
         private TextInputControl textInputControl;
 
 
@@ -30,8 +30,18 @@ namespace Wordgeon
             castTileSpell = GetControl<ButtonControl>(Controls.CastTileSpell);
             anyLetter = GetControl<ButtonControl>(Controls.AnyLetter);
             textInputControl = GetControl<TextInputControl>(Controls.TextInput);
+            restart = GetControl<ButtonControl>(Controls.Restart);
             StartCoroutine(RunPlayerInteraction());
         }
+
+        protected override void Update()
+        {
+            if (restart.WasPushed())
+            {
+                Scene.Load(nameof(SceneFactory.GameplayScene), Gameplay.NewGame());
+            }
+        }
+
 
         private IEnumerator RunPlayerInteraction()
         {

@@ -12,7 +12,7 @@ namespace Wordgeon
         {
             Gameplay = gameplay;
             var m = (Constants.TileDim * Constants.LevelDim) / 2;
-            Position = new Vector2(m, m);
+            Position = new Vector2(m + 180, m);
             AddComponent(new Camera());
         }
 
@@ -151,7 +151,7 @@ namespace Wordgeon
 
         public Hud(Gameplay gameplay) : base(gameplay)
         {
-            Position = new Vector2(1000, 100);
+            Position = new Vector2(1000, 0);
             lettersSprite = new TextSprite("Font", "", SpriteLayers.Player);
             AddComponent(lettersSprite);
             AddComponent(new RelayBehavior(Update));
@@ -166,7 +166,15 @@ namespace Wordgeon
                 .Select(c => new { Char = c.Key, Count = c.Count() })
                 .Select(c => $"{char.ToUpper(c.Char)} x {c.Count}");
 
-            lettersSprite.Text = string.Join("\n", values);
+            lettersSprite.Text =
+                $"Wordgeon - Level {Gameplay.State.Dungeon.ActiveLevel.Level}\n\n" +
+                "Available Letters:\n" +
+                string.Join("\n", values.Concat(Enumerable.Range(0, 26 - values.Count()).Select(_ => " "))) +
+                "\nArrow keys move\n" +
+                "[Enter] starts entry\n" +
+                "[Space] toggles entry dir\n" +
+                "[Escape] cancels entry\n" +
+                "[F5] starts new game";
 
         }
     }
