@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Linq;
 
 namespace Coldsteel.Controls
@@ -11,5 +12,9 @@ namespace Coldsteel.Controls
 
         public string InputBuffer(PlayerIndex playerIndex = PlayerIndex.One) =>
             _bindingsByPlayer[(int)playerIndex].FirstOrDefault()?.InputBuffer ?? "";
+
+        public void BeginInput() => InputManager.BeginTextInput();
+
+        public void EndInput() => InputManager.EndTextInput();
     }
 }

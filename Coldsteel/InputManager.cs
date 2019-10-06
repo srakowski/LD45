@@ -7,12 +7,15 @@ using Microsoft.Xna.Framework.Input;
 using KB = Microsoft.Xna.Framework.Input.Keyboard;
 using MS = Microsoft.Xna.Framework.Input.Mouse;
 using GP = Microsoft.Xna.Framework.Input.GamePad;
+using System;
 
 namespace Coldsteel
 {
     internal class InputManager : GameComponent
     {
         private static string windowInput;
+        private static bool recordTextInput;
+
         private readonly Engine _engine;
 
         public InputManager(Game game, Engine engine) : base(game)
@@ -65,8 +68,21 @@ namespace Coldsteel
             GamePads[(int)playerIndex] = GamePads[(int)playerIndex].Next(GP.GetState(playerIndex));
         }
 
+        public static void BeginTextInput()
+        {
+            windowInput = "";
+            recordTextInput = true;
+        }
+
+        public static void EndTextInput()
+        {
+            recordTextInput = false;
+            windowInput = "";
+        }
+
         private void Window_TextInput(object sender, TextInputEventArgs e)
         {
+            if (!recordTextInput) return;
             windowInput += e.Character;
         }
     }
