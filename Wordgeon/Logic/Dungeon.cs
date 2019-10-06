@@ -178,9 +178,10 @@ namespace Wordgeon.Logic
                     v => v.Cell
                 );
 
+            var mid = Constants.LevelDim / 2;
+
             if (level == 1)
             {
-                var mid = Constants.LevelDim / 2;
                 var col = mid - 3;
                 foreach (var c in "nothing")
                 {
@@ -199,6 +200,15 @@ namespace Wordgeon.Logic
                     cells[pos] = cell;
                     col++;
                 }
+            }
+
+            if (level == Constants.NumberOfLevels)
+            {
+                var pos = new Point(mid, mid);
+                var cell = cells[pos];
+                // this will work, its okay
+                cell = cell.SetOccupant(new BlankTileOfYendor());
+                cells[pos] = cell;
             }
 
             return new DungeonLevel(level, cells);

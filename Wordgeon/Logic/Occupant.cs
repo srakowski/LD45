@@ -31,4 +31,12 @@ namespace Wordgeon.Logic
     {
         public Player InteractWithPlayer(Player player) => player;
     }
+
+    public class BlankTileOfYendor : IOccupant
+    {
+        public Player InteractWithPlayer(Player player)
+        {
+            return player.SetBlankTileOfYendor(player, this);
+        }
+    }
 }

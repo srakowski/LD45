@@ -34,7 +34,7 @@ namespace Wordgeon
 
         private IEnumerator RunPlayerInteraction()
         {
-            while (!gameplay.TilePlacer.HasValue)
+            while (true)
             {
                 if (up.WasPushed())
                 {
@@ -58,11 +58,25 @@ namespace Wordgeon
                 }
 
                 if (gameplay.TilePlacer.HasValue)
+                {
+                    StartCoroutine(RunTilePlacer());
                     break;
+                }
+
+                if (gameplay.Player.BlankTileOfYendor.HasValue)
+                {
+                    StartCoroutine(RunGameOver());
+                    break;
+                }
 
                 yield return Wait.None();
             }
-            StartCoroutine(RunTilePlacer());
+        }
+
+        private IEnumerator RunGameOver()
+        {
+            Scene.Load(nameof(SceneFactory.GameOverScene), this.gameplay);
+            yield return Wait.None();
         }
 
         private IEnumerator RunTilePlacer()

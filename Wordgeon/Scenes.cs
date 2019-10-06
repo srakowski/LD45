@@ -24,6 +24,7 @@ namespace Wordgeon
             scene.AddAsset(new Asset<Texture2D>("tile_placer"));
             scene.AddAsset(new Asset<Texture2D>("letterchest"));
             scene.AddAsset(new Asset<Texture2D>("stairs"));
+            scene.AddAsset(new Asset<Texture2D>("btoy"));
             scene.AddAsset(new Asset<SpriteFont>("Font"));
 
             SpriteLayers.Setup(scene);
@@ -35,6 +36,11 @@ namespace Wordgeon
             scene.AddEntity(new Hud(gameplay));
 
             return scene;
+        }
+
+        public Scene GameOverScene(Gameplay gameplay)
+        {
+            throw new NotImplementedException();
         }
     }
 }

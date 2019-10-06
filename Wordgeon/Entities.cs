@@ -61,6 +61,9 @@ namespace Wordgeon
             StairsSprite = new Sprite("stairs", SpriteLayers.OccupantTiles) { Enabled = false };
             AddComponent(StairsSprite);
 
+            BTOYendorSprite = new Sprite("btoy", SpriteLayers.OccupantTiles) { Enabled = false };
+            AddComponent(BTOYendorSprite);
+
             letterSprite = new TextSprite("Font", "", SpriteLayers.LetterTiles)
             {
                 Enabled = false,
@@ -74,6 +77,7 @@ namespace Wordgeon
 
         public Sprite ChestSprite { get; }
         public Sprite StairsSprite { get; }
+        public Sprite BTOYendorSprite { get; }
 
         private void UpdateTile()
         {
@@ -92,7 +96,7 @@ namespace Wordgeon
             var occupant = tile.Bind(v => v.Occupant).ValueOr(() => null);
             ChestSprite.Enabled = occupant is LetterChest;
             StairsSprite.Enabled = occupant is UpStairs || occupant is DownStairs;
-
+            BTOYendorSprite.Enabled = occupant is BlankTileOfYendor;
 
             Sprite.Color = Color.White;
             if (Gameplay.TilePlacer.HasValue)

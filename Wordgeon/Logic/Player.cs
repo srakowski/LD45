@@ -9,23 +9,27 @@ namespace Wordgeon.Logic
     {
         private Player(
             Point levelPos,
-            IEnumerable<LetterTile> letterInventory
-            )
+            IEnumerable<LetterTile> letterInventory,
+            Maybe<BlankTileOfYendor> blankTileOfYendor)
         {
             LevelPosition = levelPos;
             LetterInventory = letterInventory;
+            BlankTileOfYendor = blankTileOfYendor;
         }
 
         public Point LevelPosition { get; }
 
         public IEnumerable<LetterTile> LetterInventory { get; }
 
+        public Maybe<BlankTileOfYendor> BlankTileOfYendor { get; }
+
         public static Player New()
         {
             var lvlCenter = Constants.LevelDim / 2;
             return new Player(
                 new Point(lvlCenter, lvlCenter),
-                Enumerable.Empty<LetterTile>()
+                Enumerable.Empty<LetterTile>(),
+                Maybe.None<BlankTileOfYendor>()
                 );
         }
 
@@ -33,7 +37,7 @@ namespace Wordgeon.Logic
         {
             if (!cell.Occupant.HasValue && cell.LetterTile.HasValue)
             {
-                return (new Player(cell.Position, LetterInventory), cell);
+                return (new Player(cell.Position, LetterInventory, BlankTileOfYendor), cell);
             }
 
             if  (cell.Occupant.HasValue)
@@ -49,13 +53,19 @@ namespace Wordgeon.Logic
             return Maybe.None<(Player, DungeonCell)>();
         }
 
+        internal Player SetBlankTileOfYendor(Player player, BlankTileOfYendor btoy)
+        {
+            return new Player(LevelPosition, LetterInventory, btoy);
+        }
+
         public Maybe<Player> RemoveLetter(char letter)
         {
             if (!LetterInventory.Any(l => l.Value == letter)) return Maybe.None<Player>();
             var letterTile = LetterInventory.First(l => l.Value == letter);
             return new Player(
                 LevelPosition,
-                LetterInventory.Where(l => l != letterTile).ToArray()
+                LetterInventory.Where(l => l != letterTile).ToArray(),
+                BlankTileOfYendor
                 );
         }
 
@@ -63,13 +73,16 @@ namespace Wordgeon.Logic
         {
             return new Player(
                 LevelPosition,
-                LetterInventory.Concat(enumerable).ToArray()
+                LetterInventory.Concat(enumerable).ToArray(),
+                BlankTileOfYendor
                 );
         }
 
         internal Player SetPosition(Point position)
         {
-            return new Player(position, LetterInventory);
+            return new Player(position,
+                LetterInventory,
+                BlankTileOfYendor);
         }
     }
 }

@@ -3,6 +3,7 @@
 // file 'LICENSE.txt', which is part of this source code package.
 
 using Microsoft.Xna.Framework.Content;
+using System;
 using System.Collections.Generic;
 
 namespace Coldsteel
@@ -86,6 +87,12 @@ namespace Coldsteel
             var oldContent = _content;
             LoadContent();
             oldContent.Unload();
+        }
+
+        public void Load(string sceneName, object param)
+        {
+            if (_engine == null) return;
+            _engine.LoadScene(sceneName, param);
         }
     }
 }
