@@ -58,7 +58,7 @@ namespace WordGame.Logic
 
         public static GameState New(Words words, string playerName)
         {
-            var random = new Random(23);
+            var random = new Random();
             var startsWith = new StartsWith('n', 'o');
             var charBoard = CharBoard.New(random, words, startsWith, "nothing");
             return new GameState(
@@ -209,6 +209,24 @@ namespace WordGame.Logic
                 AttemptResults,
                 Player,
                 encounter.Value,
+                LootEscrow,
+                XPEscrow).ToMaybe();
+        }
+
+        public Maybe<GameState> ExecuteEnemyTurn()
+        {
+            var player = Player;
+            var enemyAttack = Encounter.ActiveEnemy.Select(e => e.AttackDamage(Random, 0)).ValueOr(() => 0);
+            player = Player.TakeMitigatedDamage(enemyAttack);
+
+            return new GameState(
+                Random,
+                Words,
+                StartsWith,
+                CharBoard,
+                AttemptResults,
+                player,
+                Encounter,
                 LootEscrow,
                 XPEscrow).ToMaybe();
         }

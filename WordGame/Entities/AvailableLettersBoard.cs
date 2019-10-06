@@ -17,7 +17,7 @@ namespace WordGame.Entities
             int i = 0;
             for (int r = 0; r < 4; r++)
             {
-                for (int c = 0; c < 4; c++)
+                for (int c = 0; c < 8; c++)
                 {
                     var alt = new AvailableLetterTile(
                         new Vector2(c * AvailableTileWidth, r * AvailableTileHeight),

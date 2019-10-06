@@ -31,7 +31,7 @@ namespace WordGame.Behaviors
             var timer = StartCoroutine(RunTimer());
             while (true)
             {
-                statusSprite.Text = $"Attack {Math.Clamp((int)(timeLeft / 1000), 0, 9)}";
+                statusSprite.Text = $"Attack {Math.Clamp((int)(timeLeft / 1000), 0, Constants.TimeToGuessInSecs - 1)}";
                 bool done = false;
                 var data = textInputControl.InputBuffer();
                 var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
@@ -80,55 +80,70 @@ namespace WordGame.Behaviors
 
         private IEnumerator RunDefense()
         {
-            var timer = StartCoroutine(RunTimer());
-            statusSprite.Text = "Defend";
-            while (true)
-            {
-                statusSprite.Text = $"Defend {Math.Clamp((int)(timeLeft / 1000), 0, 9)}";
-                var done = false;
-                var data = textInputControl.InputBuffer();
-                var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
-                foreach (var c in enteredLetters)
-                {
-                    if (c == '\b')
-                    {
-                        gameplay.UndoLastSelection();
-                    }
-                    else if (c == '\r')
-                    {
-                        done = gameplay.Defend();
-                        break;
-                    }
-                    else
-                    {
-                        gameplay.MakeAutoLetterSelection(c);
-                    }
-                }
-                if (done) break;
+            statusSprite.Text = "Victory";
+            gameplay.ExecuteEnemyTurn();
+            yield return Wait.Duration(4);
 
-                if (timer.IsFinished)
-                {
-                    gameplay.Fail();
-                    break;
-                }
-
-                yield return Wait.None();
-            }
-
-            timer.Abort();
-
-            if (gameplay.PlayerIsAlive && gameplay.EnemyIsAlive)
+            if (gameplay.PlayerIsAlive)
             {
                 StartCoroutine(RunAttack());
-            }
-            else if (gameplay.PlayerIsAlive)
-            {
-                StartCoroutine(RunBattleVictoryCondition());
             }
             else
             {
                 throw new NotImplementedException();
             }
+
+            /// StartCoroutine(StartEncounter());
+
+            //var timer = StartCoroutine(RunTimer());
+            //statusSprite.Text = "Defend";
+            //while (true)
+            //{
+            //    statusSprite.Text = $"Defend {Math.Clamp((int)(timeLeft / 1000), 0, Constants.TimeToGuessInSecs - 1)}";
+            //    var done = false;
+            //    var data = textInputControl.InputBuffer();
+            //    var enteredLetters = data.Where(c => char.IsLetter(c) || c == '\b' || c == '\r').ToArray();
+            //    foreach (var c in enteredLetters)
+            //    {
+            //        if (c == '\b')
+            //        {
+            //            gameplay.UndoLastSelection();
+            //        }
+            //        else if (c == '\r')
+            //        {
+            //            done = gameplay.Defend();
+            //            break;
+            //        }
+            //        else
+            //        {
+            //            gameplay.MakeAutoLetterSelection(c);
+            //        }
+            //    }
+            //    if (done) break;
+
+            //    if (timer.IsFinished)
+            //    {
+            //        gameplay.Fail();
+            //        break;
+            //    }
+
+            //    yield return Wait.None();
+            //}
+
+            //timer.Abort();
+
+            //if (gameplay.PlayerIsAlive && gameplay.EnemyIsAlive)
+            //{
+            //    StartCoroutine(RunAttack());
+            //}
+            //else if (gameplay.PlayerIsAlive)
+            //{
+            //    StartCoroutine(RunBattleVictoryCondition());
+            //}
+            //else
+            //{
+            //    throw new NotImplementedException();
+            //}
         }
 
         private IEnumerator RunBattleVictoryCondition()

@@ -83,7 +83,7 @@ namespace WordGame.Logic
             var characters = wordSet
                 .OrderBy(w => w.Value == forceInclude?.Value ? 0 : w.Value.Length)
                 .Aggregate(Enumerable.Empty<char>(), AddWord)
-                .Take(16)
+                .Take(32)
                 .OrderBy(_ => random?.Next() ?? 0)
                 .ToArray();
 

@@ -13,7 +13,7 @@
 
         public const int StartingHP = 24;
 
-        public const int TimeToGuessInSecs = 10;
+        public const int TimeToGuessInSecs = 21;
 
         public static float DmgMod => 48f;
     }

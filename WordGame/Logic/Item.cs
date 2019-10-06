@@ -81,7 +81,7 @@ namespace WordGame.Logic
         public Dice Damage { get; }
 
 
-        public static Weapon Fists() => new Weapon("Fists", new Dice(D(2), D(2), D(2)));
+        public static Weapon Fists() => new Weapon("Fists", new Dice(D(2), D(2)));
 
         public static Weapon Dagger() => new Weapon("Dagger", new Dice(D(3), D(3)));
 

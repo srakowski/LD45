@@ -56,6 +56,12 @@ namespace WordGame.Logic
             return HandleUpdateResult(result);
         }
 
+        public bool ExecuteEnemyTurn()
+        {
+            var result = CurrentState.ExecuteEnemyTurn();
+            return HandleUpdateResult(result);
+        }
+
         internal bool CollectLoot()
         {
             var result = CurrentState.CollectWinnings();
