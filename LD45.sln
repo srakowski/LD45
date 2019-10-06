@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coldsteel", "Coldsteel\Cold
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wordgeon", "Wordgeon\Wordgeon.csproj", "{40A703A3-20E5-423C-90BA-70E993DE53E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordgeon.DesktopGL", "Wordgeon.DesktopGL\Wordgeon.DesktopGL.csproj", "{38F08420-6C25-4B2F-949B-CB3D3A724114}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{40A703A3-20E5-423C-90BA-70E993DE53E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40A703A3-20E5-423C-90BA-70E993DE53E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40A703A3-20E5-423C-90BA-70E993DE53E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38F08420-6C25-4B2F-949B-CB3D3A724114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38F08420-6C25-4B2F-949B-CB3D3A724114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38F08420-6C25-4B2F-949B-CB3D3A724114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38F08420-6C25-4B2F-949B-CB3D3A724114}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
