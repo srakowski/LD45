@@ -40,7 +40,9 @@ namespace Wordgeon.Logic
                     var setStairsAt = upStairsForNext.Value;
                     var mcell = lwus.GetCell(setStairsAt);
                     if (!mcell.HasValue) break;
-                    var cws = mcell.Value.SetOccupant(new UpStairs());
+                    //var cws = mcell.Value.SetOccupant(new UpStairs());
+
+                    var cws = mcell.Value.LayTile(new LetterTile((char)random.Next((int)'a', (int)'z' + 1))).Value;
                     lwus = lwus.SetCell(cws);
                 }
 
